@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single" android:id="@+id/grp1" >
+        <item android:id="@+id/mHome" android:title="Home" android:icon="@drawable/home" android:checked="true"/>
+        <item android:id="@+id/mProfile" android:title="My Profile" android:icon="@drawable/profile_l" android:checked="true"/>
+        <item android:id="@+id/mMenu" android:title="My Menu" android:icon="@drawable/menu_l" android:checked="true"/>
+        <item android:id="@+id/mOrders" android:title="Orders" android:icon="@drawable/orders_l" android:checked="true"/>
+        <item android:id="@+id/bcasts" android:title="Broadcasts" android:icon="@drawable/broadcaat_l" android:checked="true"/>
+        <item android:id="@+id/mHistory" android:title="History" android:icon="@drawable/history_l" android:checked="true"/>
+        <item android:id="@+id/pDet" android:title="Personal Details" android:icon="@drawable/pdet_l" android:checked="true"/>
+        <item android:id="@+id/prefs" android:title="Preferences" android:icon="@drawable/prefs_l" android:checked="true"/>
+        <item android:id="@+id/qt" android:title="Quit" android:icon="@drawable/ic_baseline_close_24" android:checked="true"/>
+    </group>
+
+</menu>

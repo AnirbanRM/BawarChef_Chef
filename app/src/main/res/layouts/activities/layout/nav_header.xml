@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/header"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@color/button_color" >
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/nav_hdr_uname"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Welcome,"
+            app:layout_constraintStart_toEndOf="@id/profile_pic"
+            android:textColor="#ffffff"
+            android:layout_marginStart="15dp"
+            android:textSize="10sp"
+            android:fontFamily="@font/raleway_light" />
+
+        <ImageView
+            android:id="@+id/profile_pic"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/person"/>
+
+        <TextView
+            android:id="@+id/nav_hdr_uname"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="@id/profile_pic"
+            app:layout_constraintBottom_toBottomOf="@id/profile_pic"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="Username"
+            app:layout_constraintStart_toEndOf="@id/profile_pic"
+            android:textColor="#ffffff"
+            android:layout_marginStart="15dp"
+            android:textSize="14sp"
+            android:fontFamily="@font/raleway_semibold" />
+
+        <TextView
+            android:id="@+id/nav_hdr_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/profile_pic"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:text="Name"
+            android:textColor="#ffffff"
+            android:layout_marginTop="10dp"
+            android:textSize="14sp"
+            android:fontFamily="@font/raleway_semibold" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

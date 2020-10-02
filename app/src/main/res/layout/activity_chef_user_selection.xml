@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <Space
+        android:id="@+id/spc"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/chefbut"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="5dp"
+        android:layout_marginStart="40dp"
+        android:background="@drawable/textbox_design"
+        android:paddingBottom="50dp"
+        android:paddingTop="10dp"
+        android:src="@drawable/menu_l"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="1"
+        app:layout_constraintEnd_toStartOf="@id/spc"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="#80000000" />
+
+    <TextView
+        android:id="@+id/chefText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/chefbut"
+        app:layout_constraintStart_toStartOf="@id/chefbut"
+        app:layout_constraintBottom_toBottomOf="@id/chefbut"
+        android:text="Chef"
+        android:fontFamily="@font/raleway_black"
+        android:layout_margin="20dp"
+        android:textSize="20sp"/>
+
+    <ImageView
+        android:id="@+id/userbut"
+        app:layout_constraintDimensionRatio="1"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:src="@drawable/customer_sign"
+        android:paddingTop="10dp"
+        android:paddingBottom="50dp"
+        app:layout_constraintStart_toEndOf="@id/spc"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/textbox_design"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="40dp"
+        app:tint="#80000000" />
+
+    <TextView
+        android:id="@+id/custoText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="@id/userbut"
+        app:layout_constraintStart_toStartOf="@id/userbut"
+        app:layout_constraintBottom_toBottomOf="@id/userbut"
+        android:text="Customer"
+        android:fontFamily="@font/raleway_black"
+        android:layout_margin="20dp"
+        android:textSize="20sp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

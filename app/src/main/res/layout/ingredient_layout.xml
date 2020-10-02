@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/ingredient"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/button_color"
+        android:fontFamily="@font/raleway_bold"
+        android:textSize="18sp"
+        android:text="Ingredients"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/ingredientList"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/ingredient"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        app:layout_constraintBottom_toTopOf="@id/add_ingredient" />
+
+    <Button
+        android:id="@+id/add_ingredient"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:background="@drawable/add"
+        android:backgroundTint="@color/button_color"
+        app:layout_constraintStart_toStartOf="@id/ingredientList"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="15dp" />
+
+    <TextView
+        android:id="@+id/add_IngStr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/add_ingredient"
+        app:layout_constraintTop_toTopOf="@id/add_ingredient"
+        app:layout_constraintBottom_toBottomOf="@id/add_ingredient"
+        android:text="Add Ingredients"
+        android:fontFamily="@font/raleway_light"
+        android:layout_marginStart="10dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

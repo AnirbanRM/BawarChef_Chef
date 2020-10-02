@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.drawerlayout.widget.DrawerLayout
+    android:id="@+id/drawer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DashboardActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/head"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/button_color"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:padding="15dp">
+
+            <ImageButton
+                android:id="@+id/menu_but"
+                android:layout_width="30dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1"
+                android:src="@drawable/menu"
+                android:scaleType="centerCrop"
+                android:background="#00000000"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent" />
+
+            <TextView
+                android:id="@+id/circ_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Circle"
+                app:layout_constraintStart_toEndOf="@id/menu_but"
+                app:layout_constraintTop_toTopOf="parent"
+                android:layout_marginStart="15dp"
+                android:fontFamily="@font/raleway_regular"
+                android:textColor="#ffffff" />
+
+            <TextView
+                android:id="@+id/ar_circ"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="@id/circ_text"
+                app:layout_constraintTop_toBottomOf="@id/circ_text"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:textColor="#ffffff"
+                android:fontFamily="@font/raleway_bold"
+                android:textSize="20sp"
+                android:text="Fetching..."/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:id="@+id/fragmentViewPort"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/head"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/navView"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        app:menu="@menu/main_menu"
+        app:headerLayout="@layout/nav_header"
+        android:layout_gravity="start"
+        app:itemIconTint="@drawable/nav_item_style"
+        app:itemTextColor="@drawable/nav_item_style"
+        />
+
+</androidx.drawerlayout.widget.DrawerLayout>

@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/button_color"
+    android:clickable="true"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/food_menu_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:fontFamily="@font/raleway_thin"
+        android:text="My Menu"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        app:layout_constraintTop_toBottomOf="@id/food_menu_header"
+        android:layout_marginTop="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/food_custo_nav"
+        android:layout_height="0dp"
+        android:paddingStart="30dp"
+        android:paddingEnd="30dp"
+        android:paddingTop="30dp"
+        android:background="@android:color/white"
+        android:layout_width="match_parent">
+
+        <Button
+            android:id="@+id/orders_back_button"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:background="@drawable/back"
+            android:backgroundTint="@android:color/black"
+            app:layout_constraintDimensionRatio="1" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/priceConst"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/orders_back_button">
+
+            <Space
+                android:id="@+id/pSpc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+
+            <TextView
+                android:id="@+id/basePT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Base Price"
+                app:layout_constraintTop_toTopOf="parent"
+                android:fontFamily="@font/raleway_regular"
+                android:textColor="@android:color/black"
+                app:layout_constraintStart_toStartOf="@id/baseBox"
+                app:layout_constraintEnd_toEndOf="@id/baseBox" />
+
+            <EditText
+                android:id="@+id/baseBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toStartOf="@id/pSpc"
+                android:inputType="numberSigned"
+                android:layout_marginEnd="5dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/basePT"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/textbox_design"
+                android:hint="Amount"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:fontFamily="@font/raleway_regular"
+                android:padding="5dp" />
+
+            <TextView
+                android:id="@+id/subsqPT"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Every 30 mins"
+                app:layout_constraintTop_toTopOf="parent"
+                android:fontFamily="@font/raleway_regular"
+                android:textColor="@android:color/black"
+                app:layout_constraintStart_toStartOf="@id/subsqBox"
+                app:layout_constraintEnd_toEndOf="@id/subsqBox" />
+
+            <EditText
+                android:id="@+id/subsqBox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/pSpc"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:inputType="numberSigned"
+                app:layout_constraintTop_toBottomOf="@id/subsqPT"
+                android:layout_marginTop="5dp"
+                android:layout_marginStart="5dp"
+                android:background="@drawable/textbox_design"
+                android:hint="Amount"
+                android:gravity="center"
+                android:textSize="14sp"
+                android:fontFamily="@font/raleway_regular"
+                android:padding="5dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <FrameLayout
+            android:visibility="visible"
+            android:id="@+id/ingreF"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/priceConst"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <include
+                android:layout_height="match_parent"
+                android:layout_width="match_parent"
+                layout="@layout/ingredient_layout" />
+
+        </FrameLayout>
+
+        <FrameLayout
+            android:visibility="visible"
+            android:id="@+id/custoF"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="20dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/priceConst"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <include
+                layout="@layout/menu_structure"
+                android:layout_height="match_parent"
+                android:layout_width="match_parent" />
+
+        </FrameLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/food_custo_nav"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="0dp"
+        android:theme="@style/Widget.BottomNavigationView"
+        app:itemIconTint="@drawable/bottom_nav_item_style"
+        app:itemTextColor="@drawable/bottom_nav_item_style"
+        android:background="@android:color/white"
+        app:menu="@menu/food_customization_menu"/>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

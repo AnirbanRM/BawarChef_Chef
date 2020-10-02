@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/button_color"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/profile_header"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/raleway_thin"
+        android:text="My Profile"
+        android:textColor="@android:color/white"
+        android:textSize="40sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageButton
+        android:id="@+id/profile_upd_but"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="@id/profile_header"
+        app:layout_constraintBottom_toBottomOf="@id/profile_header"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintDimensionRatio="1"
+        android:src="@drawable/check"
+        android:background="@drawable/round_button"
+        android:backgroundTint="@android:color/white"
+        android:tint="@color/button_color"
+        android:layout_margin="10dp"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/body"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/profile_header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginTop="20dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/namedp"
+                android:translationZ="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:background="@color/button_color">
+
+                <Space
+                    android:id="@+id/dp_spc"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/profile_dp"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="10dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/person"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintDimensionRatio="1"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toEndOf="@id/dp_spc"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="1.0" />
+
+                <ImageButton
+                    android:id="@+id/edit_dp"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/round_button"
+                    android:backgroundTint="#00BCD4"
+                    android:src="@drawable/three_dot"
+                    android:scaleType="fitXY"
+                    android:tint="@android:color/white"
+                    app:layout_constraintBottom_toBottomOf="@id/profile_dp"
+                    app:layout_constraintEnd_toEndOf="@+id/profile_dp" />
+
+                <EditText
+                    android:id="@+id/profile_un"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:fontFamily="@font/raleway_semibold"
+                    android:text="Username"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#ffffff"
+                    app:layout_constraintBottom_toBottomOf="@id/profile_dp"
+                    app:layout_constraintEnd_toStartOf="@id/dp_spc"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/profile_dp" />
+
+                <TextView
+                    android:id="@+id/profile_n"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintTop_toBottomOf="@id/profile_un"
+                    app:layout_constraintStart_toStartOf="@id/profile_un"
+                    app:layout_constraintEnd_toStartOf="@id/dp_spc"
+                    android:text="Name"
+                    android:layout_marginStart="5dp"
+                    android:textColor="@android:color/white"
+                    android:fontFamily="@font/raleway_semibold" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <ScrollView
+                android:background="@android:color/white"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/namedp"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingBottom="20dp">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/bioCL"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="50dp"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent">
+
+                            <TextView
+                                android:id="@+id/bio_text"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/raleway_regular"
+                                android:text="Bio"
+                                android:textColor="@android:color/white"
+                                android:background="@color/button_color"
+                                android:textSize="18sp"
+                                android:padding="10dp"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <EditText
+                                android:id="@+id/profile_bio_box"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintHeight_min="200dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginEnd="30dp"
+                                android:ems="10"
+                                android:inputType="textMultiLine"
+                                android:gravity="top"
+                                android:hint="Tell something about yourself !"
+                                android:backgroundTint="@color/button_color"
+                                android:paddingTop="10dp"
+                                android:paddingBottom="20dp"
+                                android:fontFamily="@font/raleway_semibold"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toBottomOf="@+id/bio_text" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <TextView
+                            android:id="@+id/profile_location_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toBottomOf="@id/bioCL"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:text="Location"
+                            android:textColor="@android:color/white"
+                            android:background="@color/button_color"
+                            android:textSize="18sp"
+                            android:padding="10dp"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="60dp"
+                            android:fontFamily="@font/raleway_regular" />
+
+                        <com.google.android.gms.maps.MapView
+                            android:id="@+id/profile_location_image"
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            app:layout_constraintDimensionRatio="1"
+                            app:layout_constraintTop_toBottomOf="@id/profile_location_text"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="10dp" />
+
+                        <TextView
+                            android:id="@+id/chgLoc"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Change Location"
+                            app:layout_constraintEnd_toEndOf="@id/profile_location_image"
+                            app:layout_constraintTop_toTopOf="@id/profile_location_image"
+                            android:padding="10dp"
+                            android:layout_margin="10dp"
+                            android:background="@drawable/textbox_design"
+                            android:backgroundTint="@color/button_color"
+                            android:textColor="@android:color/white"
+                            android:gravity="center"
+                            android:fontFamily="@font/raleway_regular" />
+                        
+                        <SeekBar
+                            android:id="@+id/zoomseek"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintEnd_toEndOf="@id/profile_location_image"
+                            app:layout_constraintStart_toStartOf="@id/profile_location_image"
+                            app:layout_constraintBottom_toBottomOf="@id/profile_location_image"
+                            android:layout_margin="30dp"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Zoom"
+                            app:layout_constraintStart_toStartOf="@id/zoomseek"
+                            app:layout_constraintEnd_toEndOf="@id/zoomseek"
+                            android:background="@drawable/textbox_design"
+                            android:backgroundTint="@color/button_color"
+                            android:textColor="@android:color/white"
+                            android:gravity="center"
+                            android:fontFamily="@font/raleway_regular"
+                            app:layout_constraintTop_toBottomOf="@id/zoomseek"/>
+
+
+                        <TextView
+                            android:id="@+id/profile_gallery_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toBottomOf="@id/profile_location_image"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:text="Specialities"
+                            android:textColor="@android:color/white"
+                            android:background="@color/button_color"
+                            android:textSize="18sp"
+                            android:padding="10dp"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="60dp"
+                            android:fontFamily="@font/raleway_regular" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/sp_recy_list"
+                            android:layout_width="0dp"
+                            android:layout_height="200dp"
+                            app:layout_constraintTop_toBottomOf="@id/profile_gallery_text"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:layout_marginTop="10dp"
+                            android:layout_marginStart="30dp" />
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="60dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/profile_images_text"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            android:text="Feeds"
+                            android:textColor="@android:color/white"
+                            android:background="@color/button_color"
+                            android:textSize="18sp"
+                            android:padding="10dp"
+                            android:layout_marginStart="30dp"
+                            android:layout_marginTop="40dp"
+                            android:fontFamily="@font/raleway_regular" />
+
+                        <Button
+                            android:id="@+id/addPhoto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="0dp"
+                            android:text="Add Feed"
+                            android:background="@drawable/textbox_design"
+                            android:backgroundTint="@android:color/white"
+                            android:textColor="@color/button_color"
+                            android:textAllCaps="false"
+                            android:textSize="10sp"
+                            android:fontFamily="@font/raleway_bold"
+                            app:layout_constraintEnd_toEndOf="@id/profile_images_text"
+                            app:layout_constraintTop_toTopOf="@id/profile_images_text"
+                            app:layout_constraintBottom_toBottomOf="@id/profile_images_text"
+                            android:layout_margin="10dp" />
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:layout_constraintTop_toBottomOf="@id/profile_images_text"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"
+                            app:layout_constraintHeight_min="250dp"
+                            android:layout_marginTop="20dp">
+
+                            <com.bawarchef.android.ExpandableGridView
+                                android:id="@+id/photoview"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintTop_toTopOf="parent"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                android:numColumns="3" />
+
+                            <TextView
+                                android:id="@+id/noPhotoOverlay"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                app:layout_constraintTop_toTopOf="@id/photoview"
+                                app:layout_constraintBottom_toBottomOf="@id/photoview"
+                                app:layout_constraintStart_toStartOf="@id/photoview"
+                                app:layout_constraintEnd_toEndOf="@id/photoview"
+                                android:text="No Feeds yet"
+                                android:gravity="center"
+                                android:fontFamily="@font/raleway_regular"
+                                android:textSize="24sp" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                </LinearLayout>
+                </LinearLayout>
+
+            </ScrollView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

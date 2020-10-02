@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single" android:id="@+id/grp1" >
+        <item android:id="@+id/customization" android:title="Customization" android:icon="@drawable/customize" android:checked="true"/>
+        <item android:id="@+id/ingredient" android:title="Ingredients" android:icon="@drawable/cart" android:checked="true"/>
+    </group>
+
+</menu>
