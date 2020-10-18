@@ -1,6 +1,8 @@
 package com.bawarchef.android.Fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -9,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,10 +21,14 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bawarchef.Communication.EncryptedPayload;
+import com.bawarchef.Communication.Message;
+import com.bawarchef.Communication.ObjectByteCode;
 import com.bawarchef.android.Hierarchy.DataStructure.FoodNode;
 import com.bawarchef.android.Hierarchy.DataStructure.Node;
 import com.bawarchef.android.Hierarchy.DataStructure.Tree;
 import com.bawarchef.android.R;
+import com.bawarchef.android.ThisApplication;
 
 import java.util.ArrayList;
 
@@ -43,6 +50,7 @@ public class FoodMenu extends Fragment {
     RecyclerView list;
     Button addButton;
     EditText head_name;
+    ImageButton upload;
 
     ArrayList<Node> items;
 
@@ -55,6 +63,9 @@ public class FoodMenu extends Fragment {
 
         root = t.getRoot();
         items = root.getChildren();
+
+        upload = v.findViewById(R.id.upload_menu);
+        upload.setOnClickListener(update_menu);
 
         head_name = v.findViewById(R.id.head_text);
         head_name.setEnabled(false);
@@ -74,6 +85,19 @@ public class FoodMenu extends Fragment {
             }
         });
     }
+
+    View.OnClickListener update_menu = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"UPD_CHEF_MENU");
+            m.putProperty("MENU_DATA",FoodMenu.this.t);
+            try {
+                EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
+                FoodMenu.UpdateMenuAsyncTask updateMenuAsyncTask = new FoodMenu.UpdateMenuAsyncTask();
+                updateMenuAsyncTask.execute(ep);
+            }catch (Exception e){}
+        }
+    };
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -126,7 +150,7 @@ public class FoodMenu extends Fragment {
         }
 
         void edit(int position){
-            Fragment fragment = new FoodMenu_2("Food",items.get(position));
+            Fragment fragment = new FoodMenu_2("Food",items.get(position),t);
 
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
             fragment.setTargetFragment(FoodMenu.this, 9999);
@@ -152,6 +176,27 @@ public class FoodMenu extends Fragment {
                 nextL = itemView.findViewById(R.id.nextL_but);
                 delB = itemView.findViewById(R.id.del_but);
             }
+        }
+    }
+
+    private ProgressDialog dialog;
+    class UpdateMenuAsyncTask extends AsyncTask<EncryptedPayload,Void,Void> {
+
+        @Override
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setMessage("Updating your menu. Please wait !");
+            dialog.show();
+        }
+
+        public UpdateMenuAsyncTask() {
+            dialog = new ProgressDialog(getActivity());
+        }
+
+        @Override
+        protected Void doInBackground(EncryptedPayload... encryptedPayloads) {
+            ((ThisApplication)getActivity().getApplication()).mobileClient.send(encryptedPayloads[0]);
+            return null;
         }
     }
 

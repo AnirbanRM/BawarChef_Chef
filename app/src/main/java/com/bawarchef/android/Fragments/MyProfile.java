@@ -519,5 +519,4 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
         }
     }
 
-
 }

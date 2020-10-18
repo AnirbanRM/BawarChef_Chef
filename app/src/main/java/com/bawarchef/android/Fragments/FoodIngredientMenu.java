@@ -1,6 +1,8 @@
 package com.bawarchef.android.Fragments;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.InputType;
@@ -9,10 +11,12 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 
@@ -24,11 +28,13 @@ import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.android.Hierarchy.DataStructure.FoodNode;
 import com.bawarchef.android.Hierarchy.DataStructure.Ingredient;
 import com.bawarchef.android.Hierarchy.DataStructure.Node;
 import com.bawarchef.android.Hierarchy.DataStructure.Tree;
 import com.bawarchef.android.R;
+import com.bawarchef.android.ThisApplication;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationView;
 
@@ -38,8 +44,8 @@ import static android.app.Activity.RESULT_OK;
 
 public class FoodIngredientMenu extends FoodMenu_2 {
 
-    FoodIngredientMenu(String type, Node current_node) {
-        super(type, current_node);
+    FoodIngredientMenu(String type, Node current_node, Tree t) {
+        super(type, current_node,t);
     }
 
     @Nullable
@@ -54,6 +60,7 @@ public class FoodIngredientMenu extends FoodMenu_2 {
     FrameLayout custom,ingred;
     BottomNavigationView bottomNavigationView;
     EditText baseP,subP;
+    ImageButton upload;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -64,6 +71,8 @@ public class FoodIngredientMenu extends FoodMenu_2 {
         ingred = v.findViewById(R.id.ingreF);
         baseP = v.findViewById(R.id.baseBox);
         subP = v.findViewById(R.id.subsqBox);
+        upload = v.findViewById(R.id.upload_menu);
+        upload.setOnClickListener(update_menu);
 
         bottomNavigationView = v.findViewById(R.id.food_custo_nav);
         bottomNavigationView.setOnNavigationItemSelectedListener(itemSelected);
@@ -161,6 +170,17 @@ public class FoodIngredientMenu extends FoodMenu_2 {
             holder.ingredientName.setText(i.getTitle());
             holder.amount.setText(String.valueOf(i.getMagnitude()));
 
+            if(i.getUnit()==Ingredient.Unit.GRAM)
+                holder.unitSpinner.setSelection(0);
+            else if(i.getUnit()==Ingredient.Unit.ML)
+                holder.unitSpinner.setSelection(1);
+            else if(i.getUnit()==Ingredient.Unit.KG)
+                holder.unitSpinner.setSelection(2);
+            else if(i.getUnit()==Ingredient.Unit.L)
+                holder.unitSpinner.setSelection(3);
+            else if(i.getUnit()==Ingredient.Unit.UNITS)
+                holder.unitSpinner.setSelection(4);
+
             holder.ingredientName.addTextChangedListener(new TextWatcher() {
                 @Override
                 public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
@@ -171,6 +191,15 @@ public class FoodIngredientMenu extends FoodMenu_2 {
                 @Override
                 public void afterTextChanged(Editable s) {
                     i.setTitle(holder.ingredientName.getText().toString());
+                }
+            });
+
+            holder.delButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    ((FoodNode)currentNode).getIngredients().remove(i);
+                    ingList.removeAllViews();
+                    ingList.getAdapter().notifyDataSetChanged();
                 }
             });
 
@@ -188,6 +217,27 @@ public class FoodIngredientMenu extends FoodMenu_2 {
                     }catch (Exception e) {
                         i.setMagnitude(0);
                     }
+                }
+            });
+
+            holder.unitSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String units[] = getResources().getStringArray(R.array.ingredient_units);
+                    if(units[position].equals("g"))
+                        i.setUnit(Ingredient.Unit.GRAM);
+                    else if(units[position].equals("ml"))
+                        i.setUnit(Ingredient.Unit.ML);
+                    else if(units[position].equals("Kg"))
+                        i.setUnit(Ingredient.Unit.KG);
+                    else if(units[position].equals("ltr"))
+                        i.setUnit(Ingredient.Unit.L);
+                    else if(units[position].equals("pcs"))
+                        i.setUnit(Ingredient.Unit.UNITS);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {
                 }
             });
         }
@@ -208,7 +258,7 @@ public class FoodIngredientMenu extends FoodMenu_2 {
                 super(itemView);
 
                 ingredientName = itemView.findViewById(R.id.text);
-                delButton = itemView.findViewById(R.id.del);
+                delButton = itemView.findViewById(R.id.del_but);
                 amount = itemView.findViewById(R.id.weight);
                 unitSpinner = itemView.findViewById(R.id.unitSpinner);
 
@@ -218,6 +268,27 @@ public class FoodIngredientMenu extends FoodMenu_2 {
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 unitSpinner.setAdapter(adapter);
             }
+        }
+    }
+
+    private ProgressDialog dialog;
+    class UpdateMenuAsyncTask extends AsyncTask<EncryptedPayload,Void,Void> {
+
+        @Override
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setMessage("Updating your menu. Please wait !");
+            dialog.show();
+        }
+
+        public UpdateMenuAsyncTask() {
+            dialog = new ProgressDialog(getActivity());
+        }
+
+        @Override
+        protected Void doInBackground(EncryptedPayload... encryptedPayloads) {
+            ((ThisApplication)getActivity().getApplication()).mobileClient.send(encryptedPayloads[0]);
+            return null;
         }
     }
 }

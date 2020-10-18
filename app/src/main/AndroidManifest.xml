@@ -58,7 +58,6 @@
         <activity android:name=".ChefLoginDetails" />
         <activity android:name=".UserLoginDetails" />
         <activity android:name=".ChefPDetailsActivity" />
-        <activity android:name=".MenuActivity" />
         <activity android:name=".RegistrationActivity" />
         <activity android:name=".RegistrationUserActivity" />
         <activity android:name=".MainActivity" />
