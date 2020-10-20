@@ -6,12 +6,17 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
@@ -40,6 +45,8 @@ public class DashboardActivity extends AppCompatActivity {
     TextView area_circ,navDrUName,navDrName;
 
     MobileClient.MessageProcessor defaultMessageProcessor;
+
+    static boolean changeCircle = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,6 +184,22 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 }
                 area_circ.setText(nearest.getPlaceTitle());
+                checkforCircleChange(nearest,(String)m.getProperty("REG_CIRCLE"));
+            }
+
+            else if (m.getMsg_type().equals("GEOLOC_REG_RESP")){
+                if(m.getProperty("RESULT").equals("OK")){
+                    SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPref1.edit();
+                    if(m.getProperty("CIRCLE_ID")!=null&&m.getProperty("CIRCLE_NAME")!=null) {
+                        editor.putString("DEF_CIRCLE_ID", (String) m.getProperty("CIRCLE_ID"));
+                        editor.putString("DEF_CIRCLE_NAME", (String) m.getProperty("CIRCLE_NAME"));
+                    }
+                    editor.apply();
+                    runOnUiThread(()->{
+                        Toast.makeText(DashboardActivity.this,"Successfully updated circle !",Toast.LENGTH_SHORT).show();
+                    });
+                }
             }
 
             else{
@@ -187,11 +210,50 @@ public class DashboardActivity extends AppCompatActivity {
         }
     };
 
+    private void checkforCircleChange(GeoLocationCircle nearest, String regCircle) {
+        SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData", Context.MODE_PRIVATE);
+        String circleID = sharedPref1.getString("DEF_CIRCLE_ID", null);
+        if(!regCircle.equals(circleID)){
+            SharedPreferences.Editor editor = sharedPref1.edit();
+            editor.putString("DEF_CIRCLE_ID",regCircle);
+            editor.apply();
+            circleID = regCircle;
+        }
+
+        if(circleID==null){
+            Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"CIRCLE_REGISTRATION");
+            m.putProperty("CIRCLE_ID",String.valueOf(nearest.getId()));
+            try {
+                EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getApplication()).mobileClient.getCrypto_key());
+                AsyncSender asyncSender = new AsyncSender();
+                asyncSender.execute(ep);
+            }catch(Exception e){}
+        }
+
+        else if(!circleID.equals(String.valueOf(nearest.getId()))&&changeCircle) {
+            Intent i = new Intent(DashboardActivity.this,CircleChange.class);
+            i.putExtra("newC",nearest.getPlaceTitle());
+            i.putExtra("newI",String.valueOf(nearest.getId()));
+            startActivity(i);
+
+
+        }
+    }
+
     LocationEngine.OnLocationChange onLocationChange = new LocationEngine.OnLocationChange() {
         @Override
         public void onChange(LatLng l) {
             setLocationCircle(l);
         }
     };
+
+    class AsyncSender extends AsyncTask<EncryptedPayload,Void,Void>{
+
+        @Override
+        protected Void doInBackground(EncryptedPayload... encryptedPayloads) {
+            ((ThisApplication)getApplication()).mobileClient.send(encryptedPayloads[0]);
+            return null;
+        }
+    }
 
 }

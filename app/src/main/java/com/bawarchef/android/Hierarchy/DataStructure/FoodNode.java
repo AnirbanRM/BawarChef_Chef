@@ -1,8 +1,9 @@
 package com.bawarchef.android.Hierarchy.DataStructure;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class FoodNode extends Node{
+public class FoodNode extends Node implements Serializable {
 
     ArrayList<Ingredient> ingredients;
     float baseP,subP;

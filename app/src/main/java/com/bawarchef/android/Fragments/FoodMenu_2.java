@@ -236,18 +236,17 @@ public class FoodMenu_2 extends Fragment {
         }
     }
 
-    private ProgressDialog dialog;
     class UpdateMenuAsyncTask extends AsyncTask<EncryptedPayload,Void,Void> {
 
         @Override
         protected void onPreExecute() {
-            dialog = new ProgressDialog(getActivity());
-            dialog.setMessage("Updating your menu. Please wait !");
-            dialog.show();
+            FoodMenu.dialog = new ProgressDialog(getActivity());
+            FoodMenu.dialog.setMessage("Updating your menu. Please wait !");
+            FoodMenu.dialog.show();
         }
 
         public UpdateMenuAsyncTask() {
-            dialog = new ProgressDialog(getActivity());
+            FoodMenu.dialog = new ProgressDialog(getActivity());
         }
 
         @Override

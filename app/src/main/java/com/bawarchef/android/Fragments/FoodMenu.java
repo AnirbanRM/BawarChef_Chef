@@ -6,12 +6,14 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,7 +36,7 @@ import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
 
-public class FoodMenu extends Fragment {
+public class FoodMenu extends Fragment implements MessageReceiver{
 
     View v;
 
@@ -84,18 +86,28 @@ public class FoodMenu extends Fragment {
                 list.getAdapter().notifyDataSetChanged();
             }
         });
+        fetch();
+    }
+
+    private void fetch(){
+        Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "FETCH_CHEF_MENU");
+        try {
+            EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
+            FoodMenu.FetchMenuAsyncTask fetchMenuAsyncTask = new FoodMenu.FetchMenuAsyncTask();
+            fetchMenuAsyncTask.execute(ep);
+        } catch (Exception e) {}
     }
 
     View.OnClickListener update_menu = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"UPD_CHEF_MENU");
-            m.putProperty("MENU_DATA",FoodMenu.this.t);
+            Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "UPD_CHEF_MENU");
+            m.putProperty("MENU_DATA", FoodMenu.this.t);
             try {
                 EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
                 FoodMenu.UpdateMenuAsyncTask updateMenuAsyncTask = new FoodMenu.UpdateMenuAsyncTask();
                 updateMenuAsyncTask.execute(ep);
-            }catch (Exception e){}
+            } catch (Exception e) {}
         }
     };
 
@@ -108,6 +120,41 @@ public class FoodMenu extends Fragment {
                 list.getAdapter().notifyDataSetChanged();
             }
         }
+    }
+
+    @Override
+    public void process(Message m) {
+        if(m.getMsg_type().equals("UPD_MENU_RESP")){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(dialog!=null || dialog.isShowing()){
+                        dialog.hide();
+                        dialog=null;
+                    }
+                    Toast.makeText(getActivity(),"Food menu updated succcessfully",Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        if(m.getMsg_type().equals("RESP_CHEF_MENU")){
+            getActivity().runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if(dialog!=null || dialog.isShowing()){
+                        dialog.hide();
+                        dialog=null;
+                    }
+                    Log.e("LOL",m.getProperty("MENU_TREE").toString());
+                    FoodMenu.this.t = (Tree) m.getProperty("MENU_TREE");
+                    root = t.getRoot();
+                    items = root.getChildren();
+                    list.removeAllViews();
+                    list.getAdapter().notifyDataSetChanged();
+                }
+            });
+        }
+
     }
 
     class RecyclerViewFoodAdapter extends RecyclerView.Adapter<RecyclerViewFoodAdapter.ViewHolder>{
@@ -179,7 +226,7 @@ public class FoodMenu extends Fragment {
         }
     }
 
-    private ProgressDialog dialog;
+    public static ProgressDialog dialog;
     class UpdateMenuAsyncTask extends AsyncTask<EncryptedPayload,Void,Void> {
 
         @Override
@@ -190,6 +237,26 @@ public class FoodMenu extends Fragment {
         }
 
         public UpdateMenuAsyncTask() {
+            dialog = new ProgressDialog(getActivity());
+        }
+
+        @Override
+        protected Void doInBackground(EncryptedPayload... encryptedPayloads) {
+            ((ThisApplication)getActivity().getApplication()).mobileClient.send(encryptedPayloads[0]);
+            return null;
+        }
+    }
+
+    class FetchMenuAsyncTask extends AsyncTask<EncryptedPayload,Void,Void> {
+
+        @Override
+        protected void onPreExecute() {
+            dialog = new ProgressDialog(getActivity());
+            dialog.setMessage("Getting your menu. Please wait !");
+            dialog.show();
+        }
+
+        public FetchMenuAsyncTask() {
             dialog = new ProgressDialog(getActivity());
         }
 

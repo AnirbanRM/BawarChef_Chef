@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">BawarChef</string>
-    <string name="SERVER_ADDRESS">10.0.0.4</string>
+    <string name="SERVER_ADDRESS">10.0.0.2</string>
     <string name="COMMUNICATION_PORT">3009</string>
     <string name="D_KEY_0">6cf\'K,ZvZd11lF|rTzUiz;Y6($!ZXWgc^/[-WI</string>
     <string name="title_activity_maps">Map</string>
