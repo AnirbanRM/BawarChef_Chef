@@ -488,10 +488,6 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
             dialog.show();
         }
 
-        public FetchProfileAsyncTask() {
-            dialog = new ProgressDialog(getActivity());
-        }
-
         @Override
         protected Void doInBackground(EncryptedPayload... encryptedPayloads) {
             ((ThisApplication)getActivity().getApplication()).mobileClient.send(encryptedPayloads[0]);

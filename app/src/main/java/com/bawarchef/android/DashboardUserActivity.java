@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -93,6 +94,9 @@ public class DashboardUserActivity extends AppCompatActivity {
                     }
                 }
                 area_circ.setText(nearest.getPlaceTitle());
+                ThisApplication.currentUserProfile.setUserCircle(String.valueOf(nearest.getId()));
+                ((MessageReceiver)activeFragment).process(new Message(Message.Direction.SERVER_TO_CLIENT,"LOCATION_CALLBACK"));
+
             }
 
             else{

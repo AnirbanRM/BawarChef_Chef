@@ -21,8 +21,17 @@ public class CurrentUserProfile {
     private UserIdentity userIdentity;
     private byte crypto_Key[];
     private HashMap<String,Object> extras;
+    private String userCircle=null;
 
     ClientType clientType=ClientType.X;
+
+    public String getUserCircle() {
+        return userCircle;
+    }
+
+    public void setUserCircle(String userCircle) {
+        this.userCircle = userCircle;
+    }
 
     public String getRegNo() {
         return regNo;
