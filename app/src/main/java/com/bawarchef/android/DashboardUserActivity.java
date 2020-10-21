@@ -96,7 +96,6 @@ public class DashboardUserActivity extends AppCompatActivity {
                 area_circ.setText(nearest.getPlaceTitle());
                 ThisApplication.currentUserProfile.setUserCircle(String.valueOf(nearest.getId()));
                 ((MessageReceiver)activeFragment).process(new Message(Message.Direction.SERVER_TO_CLIENT,"LOCATION_CALLBACK"));
-
             }
 
             else{

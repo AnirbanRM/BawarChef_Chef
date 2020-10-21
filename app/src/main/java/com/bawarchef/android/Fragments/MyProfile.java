@@ -475,7 +475,7 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
             gMap.addMarker(options);
         }
     }
-
+//------------------------------------------------------------------------------------------------------------------
 
     private ProgressDialog dialog;
 
