@@ -117,7 +117,6 @@ public class DashboardUserActivity extends AppCompatActivity {
     Fragment activeFragment = null;
 
     private void setFragment(MenuItem item) {
-        activeFragment = null;
 
         switch(item.getTitle().toString()){
 

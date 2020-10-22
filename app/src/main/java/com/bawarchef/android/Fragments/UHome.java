@@ -2,6 +2,7 @@ package com.bawarchef.android.Fragments;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -20,6 +21,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -45,6 +47,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
+
+import static android.app.Activity.RESULT_OK;
 
 public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallback {
 
@@ -89,7 +93,7 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
                 getActivity(), LinearLayoutManager.VERTICAL, false);
         recyclerView.setLayoutManager(recyMngr);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
-        recyclerViewChefAdapter = new RecyclerViewChefAdapter(chefs);
+        recyclerViewChefAdapter = new RecyclerViewChefAdapter(this);
         recyclerView.setAdapter(recyclerViewChefAdapter);
 
         mapView = v.findViewById(R.id.chef_map);
@@ -97,6 +101,8 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
         name = v.findViewById(R.id.name);
         rating = v.findViewById(R.id.rating);
         map_ind_v = v.findViewById(R.id.map_ind_det);
+
+        map_ind_v.setOnClickListener(map_ind_v_clicked);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -108,8 +114,16 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
 
         recyclerViewChefAdapter.notifyDataSetChanged();
 
+        getData();
         list.setVisibility(View.VISIBLE);
     }
+
+    View.OnClickListener map_ind_v_clicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            goToChef(((ChefAdvertMinorContainer)selectedMarker.getTag()).getChefID());
+        }
+    };
 
     BottomNavigationView.OnNavigationItemSelectedListener navChanged = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
@@ -126,23 +140,51 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
         }
     };
 
+    Fragment activeFragment = null;
+    public void goToChef(String id){
+        activeFragment = new UserChefView(id);
+
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        activeFragment.setTargetFragment(UHome.this,9999);
+        ft.add(R.id.fragmentViewPort,activeFragment);
+        ft.addToBackStack(null);
+
+        ft.commit();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if(requestCode==9999){
+                activeFragment=null;
+            }
+        }
+    }
+
+    private void getData(){
+        if(ThisApplication.currentUserProfile.getUserCircle()==null)return;
+
+        Message newm = new Message(Message.Direction.CLIENT_TO_SERVER,"FETCH_CHEF");
+        newm.putProperty("CIRCLE", ThisApplication.currentUserProfile.getUserCircle());
+
+        getActivity().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(newm), ((ThisApplication)getActivity().getApplication()).mobileClient.getCrypto_key());
+                    AsyncExecutor executor = new AsyncExecutor();
+                    executor.execute(ep);
+                }catch (Exception e){}
+            }
+        });
+    }
+
     @Override
     public void process(Message m) {
 
         if(m.getMsg_type().equals("LOCATION_CALLBACK")){
-            Message newm = new Message(Message.Direction.CLIENT_TO_SERVER,"FETCH_CHEF");
-            newm.putProperty("CIRCLE", ThisApplication.currentUserProfile.getUserCircle());
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    try{
-                        EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(newm), ((ThisApplication)getActivity().getApplication()).mobileClient.getCrypto_key());
-                        AsyncExecutor executor = new AsyncExecutor();
-                        executor.execute(ep);
-                    }catch (Exception e){}
-                }
-            });
+            getData();
         }
 
         else if(m.getMsg_type().equals("FETCH_CHEF_RESULT")){
@@ -158,6 +200,10 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
                     refreshMap();
                 }
             });
+        }
+
+        else if(activeFragment!=null){
+            ((MessageReceiver)activeFragment).process(m);
         }
 
     }
@@ -284,9 +330,10 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
 
 class RecyclerViewChefAdapter extends RecyclerView.Adapter<RecyclerViewChefAdapter.ViewHolder>{
 
-    ArrayList<ChefAdvertMinorContainer> chefs;
-    RecyclerViewChefAdapter(ArrayList<ChefAdvertMinorContainer> chefAdvertMinorContainers){
-        this.chefs = chefAdvertMinorContainers;
+    public ArrayList<ChefAdvertMinorContainer> chefs=new ArrayList<ChefAdvertMinorContainer>();
+    UHome uHome;
+    RecyclerViewChefAdapter(UHome uHome){
+        this.uHome = uHome;
     }
 
     @NonNull
@@ -310,6 +357,12 @@ class RecyclerViewChefAdapter extends RecyclerView.Adapter<RecyclerViewChefAdapt
             holder.dp.setImageTintList(null);
         }
         holder.rating.setText(String.format("%.1f",chef.getRating()));
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                uHome.goToChef(chef.getChefID());
+            }
+        });
     }
 
     @Override
