@@ -51,11 +51,43 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintStart_toStartOf="@id/circ_text"
                 app:layout_constraintTop_toBottomOf="@id/circ_text"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/cartB"
+                android:layout_marginEnd="10dp"
                 android:textColor="#ffffff"
                 android:fontFamily="@font/raleway_bold"
                 android:textSize="20sp"
                 android:text="Fetching..."/>
+
+            <ImageButton
+                android:id="@+id/cartB"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintDimensionRatio="1"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:src="@drawable/cart"
+                android:background="@android:color/transparent"
+                android:tint="@android:color/white"
+                android:scaleType="fitXY"
+                android:layout_margin="7dp" />
+
+            <TextView
+                android:id="@+id/cart_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                app:layout_constraintStart_toStartOf="@id/cartB"
+                app:layout_constraintTop_toTopOf="@id/cartB"
+                app:layout_constraintEnd_toEndOf="@id/cartB"
+                app:layout_constraintBottom_toBottomOf="@id/cartB"
+                app:layout_constraintVertical_bias="0.18"
+                android:textColor="@android:color/holo_red_light"
+                android:fontFamily="@font/raleway_bold"
+                android:textSize="10sp"
+                />
+
+
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -65,8 +97,10 @@
             android:layout_height="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/head"/>
+            app:layout_constraintTop_toBottomOf="@+id/head"
+            app:layout_constraintVertical_bias="0.0" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

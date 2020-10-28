@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
+    android:padding="20dp" >
+
+    <TextView
+        android:id="@+id/foodname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:textSize="18sp"
+        android:fontFamily="@font/raleway_bold"
+        android:textColor="@android:color/black"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:text="Food Name"/>
+
+    <TextView
+        android:id="@+id/category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/foodname"
+        android:textSize="14sp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/raleway_regular"
+        android:textColor="@android:color/black"
+        android:text="Category"/>
+
+    <TextView
+        android:id="@+id/qty_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/category"
+        android:textSize="14sp"
+        android:layout_marginStart="5dp"
+        android:fontFamily="@font/raleway_regular"
+        android:textColor="@android:color/black"
+        android:layout_marginTop="20dp"
+        android:text="Quantity : " />
+
+    <EditText
+        android:id="@+id/qty"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/qty_text"
+        app:layout_constraintTop_toTopOf="@id/qty_text"
+        app:layout_constraintBottom_toBottomOf="@id/qty_text"
+        android:textSize="14sp"
+        android:layout_marginStart="20dp"
+        android:background="@drawable/textbox_design"
+        android:fontFamily="@font/raleway_bold"
+        android:textColor="@android:color/black"
+        android:padding="5dp"
+        android:textAlignment="center"
+        android:hint="250" />
+
+    <Spinner
+        android:id="@+id/unit_text"
+        android:layout_width="100dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toEndOf="@id/qty"
+        app:layout_constraintTop_toTopOf="@id/qty"
+        app:layout_constraintBottom_toBottomOf="@id/qty"
+        android:textSize="14sp"
+        android:layout_marginStart="10dp"
+        android:translationZ="10dp"
+        android:fontFamily="@font/raleway_regular"
+        android:popupTheme="@style/Theme.AppCompat.Light.NoActionBar"
+        android:backgroundTint="@android:color/black"
+        android:textColor="@android:color/black"
+        />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/qty_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/custoBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:paddingBottom="80dp">
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <ImageButton
+        android:id="@+id/addCart"
+        android:layout_width="40dp"
+        android:layout_height="0dp"
+        app:layout_constraintDimensionRatio="1"
+        android:text="Add to cart"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/circle_bg"
+        android:backgroundTint="@color/button_color"
+        android:src="@drawable/cart_add"
+        android:tint="@android:color/white"
+        android:scaleType="fitXY"
+        android:layout_margin="5dp"
+        android:padding="10dp"
+        />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

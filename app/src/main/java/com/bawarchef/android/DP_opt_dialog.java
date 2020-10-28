@@ -22,7 +22,6 @@ public class DP_opt_dialog extends Activity {
         cam.setOnClickListener(clicked);
         sto.setOnClickListener(clicked);
         rem.setOnClickListener(clicked);
-
     }
 
     View.OnClickListener clicked = new View.OnClickListener() {

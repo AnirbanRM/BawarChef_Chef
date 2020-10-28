@@ -183,7 +183,7 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
     @Override
     public void process(Message m) {
 
-        if(m.getMsg_type().equals("LOCATION_CALLBACK")){
+        if(m.getMsg_type().equals("LOCATION_CALLBACK") && activeFragment==null){
             getData();
         }
 

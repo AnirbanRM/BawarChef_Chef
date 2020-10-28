@@ -5,6 +5,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -23,7 +24,9 @@ import com.bawarchef.Containers.ChefIdentity;
 import com.bawarchef.Containers.GeoLocationCircle;
 import com.bawarchef.Containers.UserIdentity;
 import com.bawarchef.android.Fragments.Broadcasts;
+import com.bawarchef.android.Fragments.Cart;
 import com.bawarchef.android.Fragments.FoodMenu;
+import com.bawarchef.android.Fragments.FoodMenu_2;
 import com.bawarchef.android.Fragments.History;
 import com.bawarchef.android.Fragments.Home;
 import com.bawarchef.android.Fragments.MessageReceiver;
@@ -35,6 +38,7 @@ import com.bawarchef.android.Fragments.UHome;
 import com.bawarchef.android.Fragments.UMyProfile;
 import com.bawarchef.android.Fragments.UOrders;
 import com.bawarchef.android.Fragments.UPreferences;
+import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 
@@ -44,8 +48,9 @@ public class DashboardUserActivity extends AppCompatActivity {
 
     DrawerLayout drawer;
     NavigationView navView;
-    ImageButton menu_but;
+    ImageButton menu_but,cartButton;
     TextView area_circ,navDrUName,navDrName;
+    TextView cartcount;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +61,12 @@ public class DashboardUserActivity extends AppCompatActivity {
         menu_but = findViewById(R.id.menu_but);
         area_circ = findViewById(R.id.ar_circ);
         navView = findViewById(R.id.navView);
+        cartButton = findViewById(R.id.cartB);
+
+        cartButton.setOnClickListener(cartClicked);
+        cartcount = findViewById(R.id.cart_no);
+
+        CartContainer.ui_count = cartcount;
 
         View headerView = navView.getHeaderView(0);
         navDrName = (TextView) headerView.findViewById(R.id.nav_hdr_name);
@@ -147,6 +158,16 @@ public class DashboardUserActivity extends AppCompatActivity {
                     .commit();
     }
 
+    View.OnClickListener cartClicked = v -> {
+        Fragment fragment = new Cart();
+
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        fragment.setTargetFragment(activeFragment, 9999);
+        ft.add(R.id.fragmentViewPort,fragment);
+        ft.addToBackStack(null);
+        ft.commit();;
+    };
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -159,7 +180,7 @@ public class DashboardUserActivity extends AppCompatActivity {
             super.onBackPressed();
         else{
             getSupportFragmentManager().popBackStack();
-            getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()-1).onResume();
+            //getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()-1).onResume();
         }
     }
 

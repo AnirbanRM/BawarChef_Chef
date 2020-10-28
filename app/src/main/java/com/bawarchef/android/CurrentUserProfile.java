@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.bawarchef.Containers.ChefIdentity;
 import com.bawarchef.Containers.UserIdentity;
+import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 
 import java.util.HashMap;
 
@@ -22,6 +23,15 @@ public class CurrentUserProfile {
     private byte crypto_Key[];
     private HashMap<String,Object> extras;
     private String userCircle=null;
+    private CartContainer cart = new CartContainer();
+
+    public CartContainer getCart() {
+        return cart;
+    }
+
+    public void setCart(CartContainer cart) {
+        this.cart = cart;
+    }
 
     ClientType clientType=ClientType.X;
 

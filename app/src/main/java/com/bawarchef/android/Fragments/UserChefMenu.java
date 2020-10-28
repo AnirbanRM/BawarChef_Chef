@@ -1,6 +1,8 @@
 package com.bawarchef.android.Fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -10,7 +12,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -23,6 +27,9 @@ import androidx.fragment.app.Fragment;
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
+import com.bawarchef.android.DashboardActivity;
+import com.bawarchef.android.DashboardUserActivity;
+import com.bawarchef.android.FoodCustomize_dialog;
 import com.bawarchef.android.Hierarchy.DataStructure.Node;
 import com.bawarchef.android.Hierarchy.DataStructure.Tree;
 import com.bawarchef.android.R;
@@ -125,16 +132,31 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
         View lastNode=textView;
         for(int i = 0; i<foodsBox.size(); i++){
             body.addView(foodsBox.get(i));
+            TextView b = getAddSubText();
+            body.addView(b);
             ConstraintSet cs = new ConstraintSet();
             cs.clone(body);
 
             cs.constrainWidth(foodsBox.get(i).getId(), ConstraintSet.MATCH_CONSTRAINT);
+
+            cs.connect(b.getId(), ConstraintSet.END, body.getId(), ConstraintSet.END, 70);
+            cs.connect(b.getId(), ConstraintSet.TOP, foodsBox.get(i).getId(), ConstraintSet.TOP, 0);
+            cs.connect(b.getId(), ConstraintSet.BOTTOM, foodsBox.get(i).getId(), ConstraintSet.BOTTOM, 0);
+
             cs.connect(foodsBox.get(i).getId(), ConstraintSet.START, body.getId(), ConstraintSet.START, 150);
-            cs.connect(foodsBox.get(i).getId(), ConstraintSet.END, body.getId(), ConstraintSet.END, 70);
+            cs.connect(foodsBox.get(i).getId(), ConstraintSet.END, b.getId(), ConstraintSet.START, 50);
 
             cs.connect(foodsBox.get(i).getId(), ConstraintSet.TOP, lastNode.getId(), ConstraintSet.BOTTOM, 70);
             cs.applyTo(body);
+            body.requestLayout();
             lastNode = foodsBox.get(i);
+
+            final int ii = i;
+            b.setOnClickListener(v -> {
+                Intent customizationIntent = new Intent(getActivity(),FoodCustomize_dialog.class);
+                customizationIntent.putExtra("DATA",foods.get(ii));
+                startActivity(customizationIntent);
+            });
         }
         return lastNode;
     }
@@ -159,18 +181,18 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
         return tv;
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
+    private TextView getAddSubText(){
+        TextView button = new TextView(getActivity());
+        button.setText("+ Add");
+        button.setId(View.generateViewId());
+        button.setTextColor(getResources().getColor(R.color.button_color,null));
+        button.setTextSize(14);
+        button.setTypeface(ResourcesCompat.getFont(getActivity(),R.font.raleway_bold));
+        button.setAllCaps(false);
+        button.setPadding(0,0,0,0);
+        button.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        return button;
+    }
 
 
     private ProgressDialog dialog;

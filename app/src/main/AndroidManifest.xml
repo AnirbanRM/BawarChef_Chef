@@ -48,6 +48,9 @@
             android:name=".DP_opt_dialog"
             android:theme="@android:style/Theme.Material.Dialog" />
         <activity
+            android:name=".FoodCustomize_dialog"
+            android:theme="@android:style/Theme.Material.Dialog" />
+        <activity
             android:name=".CircleChange"
             android:theme="@android:style/Theme.Material.Dialog" />
         <activity
