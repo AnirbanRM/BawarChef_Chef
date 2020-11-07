@@ -10,14 +10,19 @@ public class CartContainer {
 
     public static TextView ui_count;
     private String chefID;
+    private String chefname;
+    private byte[] chefDP;
     private ArrayList<CartItem> cartItems;
 
     public CartContainer(){
         cartItems = new ArrayList<CartItem>();
     }
 
-    float getCartPrice(){
-        return 0;
+    public float getCartPrice(){
+        float sum = 0;
+        for(CartItem i : cartItems)
+            sum+=(i.getBasePrice());
+        return sum;
     }
 
     public String getChefID() {
@@ -39,5 +44,21 @@ public class CartContainer {
     public void refresh(){
         String size = cartItems.size()>10?"10+":String.valueOf(cartItems.size());
         ui_count.setText(size);
+    }
+
+    public String getChefname() {
+        return chefname;
+    }
+
+    public void setChefname(String chefname) {
+        this.chefname = chefname;
+    }
+
+    public byte[] getChefDP() {
+        return chefDP;
+    }
+
+    public void setChefDP(byte[] chefDP) {
+        this.chefDP = chefDP;
     }
 }

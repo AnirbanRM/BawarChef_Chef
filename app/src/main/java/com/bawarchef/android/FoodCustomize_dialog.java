@@ -36,6 +36,7 @@ import java.util.ArrayList;
 public class FoodCustomize_dialog extends Activity {
 
     Node foodnode;
+    Object[] chef;
 
     TextView foodName,category;
     EditText qty;
@@ -65,6 +66,7 @@ public class FoodCustomize_dialog extends Activity {
 
         Intent i = getIntent();
         foodnode = (Node) i.getSerializableExtra("DATA");
+        chef = (Object[]) i.getSerializableExtra("CHEF");
 
         unitSpinner = findViewById(R.id.unit_text);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,R.array.ingredient_units,R.layout.customspinner1);
@@ -83,6 +85,10 @@ public class FoodCustomize_dialog extends Activity {
                 cartItem.addCustomization(customRadioGroup.getgName(),customRadioGroup.getSelectedText());
 
             ThisApplication.currentUserProfile.getCart().getCartItems().add(cartItem);
+            ThisApplication.currentUserProfile.getCart().setChefID((String)chef[0]);
+            ThisApplication.currentUserProfile.getCart().setChefname((String) chef[1]);
+            ThisApplication.currentUserProfile.getCart().setChefDP((byte[]) chef[2]);
+
             ThisApplication.currentUserProfile.getCart().refresh();
             FoodCustomize_dialog.this.finish();
         }

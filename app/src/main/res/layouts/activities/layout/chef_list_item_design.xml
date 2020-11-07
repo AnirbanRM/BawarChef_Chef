@@ -8,10 +8,12 @@
     app:layout_constraintTop_toTopOf="parent"
     app:layout_constraintBottom_toBottomOf="parent" 
     android:background="@drawable/textbox_design"
+    android:backgroundTint="@android:color/white"
     android:clickable="true"
     android:layout_marginTop="10dp"
     android:layout_marginStart="10dp"
     android:layout_marginEnd="10dp"
+    android:translationZ="20dp"
     >
     
     <ImageView

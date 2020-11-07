@@ -1,5 +1,6 @@
 package com.bawarchef.android.Fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -7,14 +8,17 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bawarchef.Communication.Message;
 import com.bawarchef.Containers.UserIdentity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
@@ -24,8 +28,10 @@ import com.bawarchef.android.ThisApplication;
 import java.util.ArrayList;
 import java.util.Map;
 
+import static android.app.Activity.RESULT_OK;
 
-public class Cart extends Fragment {
+
+public class Cart extends Fragment implements MessageReceiver{
 
     View v;
 
@@ -39,11 +45,14 @@ public class Cart extends Fragment {
     RecyclerView listRecyclerView;
     CartListAdapter adapter;
     CartContainer cartContainer;
+    Button bookButton;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         listRecyclerView = view.findViewById(R.id.cartlist);
+        bookButton = view.findViewById(R.id.bookButton);
+        bookButton.setOnClickListener(bookButtonClicked);
 
         cartContainer = ThisApplication.currentUserProfile.getCart();
 
@@ -53,6 +62,42 @@ public class Cart extends Fragment {
         listRecyclerView.setItemAnimator(new DefaultItemAnimator());
         adapter = new CartListAdapter();
         listRecyclerView.setAdapter(adapter);
+    }
+
+    View.OnClickListener bookButtonClicked = new View.OnClickListener(){
+
+        @Override
+        public void onClick(View v) {
+            if(cartContainer.getCartItems().size()==0){
+                Toast.makeText(getActivity(),"Empty Cart !", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            activeFragment = new UserBookingDetails();
+
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            activeFragment.setTargetFragment(Cart.this, 9999);
+            ft.add(R.id.fragmentViewPort,activeFragment);
+            ft.addToBackStack(null);
+            ft.commit();;
+        }
+    };
+
+    Fragment activeFragment=null;
+    @Override
+    public void process(Message m) {
+        if(activeFragment!=null)
+            ((MessageReceiver)activeFragment).process(m);
+    }
+
+   @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if(requestCode==9999){
+                activeFragment=null;
+            }
+        }
     }
 
     class CartListAdapter extends RecyclerView.Adapter<CartListAdapter.ViewHolder>{

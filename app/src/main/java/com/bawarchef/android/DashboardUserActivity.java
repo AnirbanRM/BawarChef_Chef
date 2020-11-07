@@ -4,40 +4,25 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
-import com.bawarchef.Containers.ChefIdentity;
 import com.bawarchef.Containers.GeoLocationCircle;
 import com.bawarchef.Containers.UserIdentity;
-import com.bawarchef.android.Fragments.Broadcasts;
 import com.bawarchef.android.Fragments.Cart;
-import com.bawarchef.android.Fragments.FoodMenu;
-import com.bawarchef.android.Fragments.FoodMenu_2;
-import com.bawarchef.android.Fragments.History;
-import com.bawarchef.android.Fragments.Home;
 import com.bawarchef.android.Fragments.MessageReceiver;
-import com.bawarchef.android.Fragments.MyProfile;
-import com.bawarchef.android.Fragments.Orders;
-import com.bawarchef.android.Fragments.PersonalDetails;
-import com.bawarchef.android.Fragments.Preferences;
 import com.bawarchef.android.Fragments.UHome;
-import com.bawarchef.android.Fragments.UMyProfile;
 import com.bawarchef.android.Fragments.UOrders;
 import com.bawarchef.android.Fragments.UPreferences;
+import com.bawarchef.android.Fragments.UserProfile;
 import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
@@ -109,7 +94,11 @@ public class DashboardUserActivity extends AppCompatActivity {
                 ((MessageReceiver)activeFragment).process(new Message(Message.Direction.SERVER_TO_CLIENT,"LOCATION_CALLBACK"));
             }
 
-            else{
+            if(cartfragment!=null){
+                ((MessageReceiver)cartfragment).process(m);
+            }
+
+            if(activeFragment!=null){
                 ((MessageReceiver)activeFragment).process(m);
             }
 
@@ -136,7 +125,7 @@ public class DashboardUserActivity extends AppCompatActivity {
                 break;
 
             case "My Profile":
-                activeFragment = new UMyProfile();
+                activeFragment = new UserProfile();
                 break;
 
             case "My Orders":
@@ -158,12 +147,13 @@ public class DashboardUserActivity extends AppCompatActivity {
                     .commit();
     }
 
+    Fragment cartfragment;
     View.OnClickListener cartClicked = v -> {
-        Fragment fragment = new Cart();
+        cartfragment = new Cart();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        fragment.setTargetFragment(activeFragment, 9999);
-        ft.add(R.id.fragmentViewPort,fragment);
+        cartfragment.setTargetFragment(activeFragment, 9999);
+        ft.add(R.id.fragmentViewPort,cartfragment);
         ft.addToBackStack(null);
         ft.commit();;
     };

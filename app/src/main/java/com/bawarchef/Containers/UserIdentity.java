@@ -13,6 +13,8 @@ public class UserIdentity implements Serializable{
 
     public UserIdentity(){}
 
-    public String userID,fname,lname,mob,email;
+    public String userID,fname,lname,mob,email,gender,dob;
+    public double lati,longi;
+    public byte dp[];
     public Address addr = new Address();
 }

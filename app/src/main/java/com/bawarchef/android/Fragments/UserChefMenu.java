@@ -35,6 +35,7 @@ import com.bawarchef.android.Hierarchy.DataStructure.Tree;
 import com.bawarchef.android.R;
 import com.bawarchef.android.ThisApplication;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 
 public class UserChefMenu extends Fragment implements MessageReceiver{
@@ -155,6 +156,11 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
             b.setOnClickListener(v -> {
                 Intent customizationIntent = new Intent(getActivity(),FoodCustomize_dialog.class);
                 customizationIntent.putExtra("DATA",foods.get(ii));
+
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                dp_img.compress(Bitmap.CompressFormat.PNG,100,byteArrayOutputStream);
+                customizationIntent.putExtra("CHEF",new Object[]{chefID,name,byteArrayOutputStream.toByteArray()});
+
                 startActivity(customizationIntent);
             });
         }

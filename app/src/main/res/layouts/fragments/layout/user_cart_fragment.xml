@@ -18,16 +18,45 @@
         android:padding="20dp"
         app:layout_constraintEnd_toEndOf="parent"
         android:translationZ="20dp"
-        android:background="@android:color/white"
-        />
+        android:background="@android:color/white" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/cartlist"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:background="@android:color/white"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cart_head"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toTopOf="@id/bookcl"/>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/bookcl"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:padding="5dp"
+        android:background="@android:color/white"
+        android:translationZ="20dp">
+
+        <Button
+            android:id="@+id/bookButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="Proceed to book"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:textColor="@android:color/white"
+            android:background="@drawable/textbox_design"
+            android:backgroundTint="@color/button_color"
+            android:textAllCaps="false"
+            android:translationZ="10dp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

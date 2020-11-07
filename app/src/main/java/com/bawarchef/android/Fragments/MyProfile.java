@@ -9,12 +9,10 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ImageButton;
@@ -34,7 +32,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
-import com.bawarchef.Containers.ProfileContainer;
+import com.bawarchef.Containers.ChefProfileContainer;
 import com.bawarchef.android.DP_opt_dialog;
 import com.bawarchef.android.ImagePicker;
 import com.bawarchef.android.R;
@@ -69,12 +67,11 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
 
     RecyclerView speciality_listV;
     ArrayList<SpecialityItem> specialityItems;
-    ImageButton mod_DP,profile_upd_button;
+    ImageButton mod_DP,profile_upd_button,addPhoto;
     EditText uname;
     TextView name;
     EditText bio;
     ImageView dp_box;
-    Button addPhoto;
     TextView changeLoc;
     PictureDestination pictureDestination = PictureDestination.X;
     MapView mapView;
@@ -154,19 +151,19 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
     }
 
     View.OnClickListener upd_profile = v -> {
-        ProfileContainer profileContainer = new ProfileContainer();
+        ChefProfileContainer chefProfileContainer = new ChefProfileContainer();
         if(dp!=null){
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             dp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            profileContainer.dp = stream.toByteArray();
+            chefProfileContainer.dp = stream.toByteArray();
         }
-        profileContainer.bio = bio.getText().toString();
-        profileContainer.resiLat = (float) currentLocation.latitude;
-        profileContainer.resiLng = (float) currentLocation.longitude;
-        profileContainer.uName = uname.getText().toString();
+        chefProfileContainer.bio = bio.getText().toString();
+        chefProfileContainer.resiLat = (float) currentLocation.latitude;
+        chefProfileContainer.resiLng = (float) currentLocation.longitude;
+        chefProfileContainer.uName = uname.getText().toString();
 
         Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"UPD_PROFILE_CHEF");
-        m.putProperty("DATA",profileContainer);
+        m.putProperty("DATA", chefProfileContainer);
 
         try {
             EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
@@ -391,16 +388,16 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
             });
         }
         else if(m.getMsg_type().equals("PROFILE_FETCH_RESP")){
-            ProfileContainer profileContainer = (ProfileContainer) m.getProperty("DATA");
+            ChefProfileContainer chefProfileContainer = (ChefProfileContainer) m.getProperty("DATA");
             getActivity().runOnUiThread(()->{
-                if(profileContainer.bio!=null)
-                    bio.setText(profileContainer.bio);
-                if(profileContainer.resiLng!=0&& profileContainer.resiLat!=0) {
-                    currentLocation = new LatLng(profileContainer.resiLat, profileContainer.resiLng);
+                if(chefProfileContainer.bio!=null)
+                    bio.setText(chefProfileContainer.bio);
+                if(chefProfileContainer.resiLng!=0&& chefProfileContainer.resiLat!=0) {
+                    currentLocation = new LatLng(chefProfileContainer.resiLat, chefProfileContainer.resiLng);
                     refreshLocation();
                 }
-                if(profileContainer.dp!=null && profileContainer.dp.length!=0) {
-                    dp = BitmapFactory.decodeByteArray(profileContainer.dp, 0, profileContainer.dp.length);
+                if(chefProfileContainer.dp!=null && chefProfileContainer.dp.length!=0) {
+                    dp = BitmapFactory.decodeByteArray(chefProfileContainer.dp, 0, chefProfileContainer.dp.length);
                     dp_box.setImageBitmap(dp);
                 }
                 if(dialog!=null&& dialog.isShowing())
