@@ -36,6 +36,7 @@ import com.bawarchef.Containers.ChefProfileContainer;
 import com.bawarchef.android.DP_opt_dialog;
 import com.bawarchef.android.ImagePicker;
 import com.bawarchef.android.R;
+import com.bawarchef.android.ScrollableMap;
 import com.bawarchef.android.SpecialityCardActivity;
 import com.bawarchef.android.SpecialityItem;
 import com.bawarchef.android.ThisApplication;
@@ -74,7 +75,7 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
     ImageView dp_box;
     TextView changeLoc;
     PictureDestination pictureDestination = PictureDestination.X;
-    MapView mapView;
+    ScrollableMap mapView;
 
     ImagePicker picker;
     GridView photosGrid;

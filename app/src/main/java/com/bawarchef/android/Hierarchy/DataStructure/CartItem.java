@@ -12,6 +12,7 @@ public class CartItem implements Serializable {
     private HashMap<String,String> customization;
     private float basePrice;
     private float incrPrice;
+    private ArrayList<Ingredient> ingredients;
 
     public CartItem(String category,String foodName, float basePrice, float incrPrice, String quantity){
         this.category = category;
@@ -33,6 +34,14 @@ public class CartItem implements Serializable {
     public void removeCustomization(String custoName, String custoValue){
         if(customization.get(custoName).equals(custoValue))
             customization.remove(custoName);
+    }
+
+    public void setIngredients(ArrayList<Ingredient> ingredients){
+        this.ingredients = ingredients;
+    }
+
+    public ArrayList<Ingredient> getIngredients(){
+        return ingredients;
     }
 
     public String getCategory() {

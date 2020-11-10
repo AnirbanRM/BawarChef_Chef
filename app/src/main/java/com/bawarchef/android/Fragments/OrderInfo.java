@@ -28,8 +28,10 @@ import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
 import com.bawarchef.Containers.OrderSummaryItem;
+import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
 import com.bawarchef.android.R;
+import com.bawarchef.android.ScrollableMap;
 import com.bawarchef.android.ThisApplication;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -65,8 +67,8 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
     TextView orderID,name,date,status,address,pricetotal;
     RecyclerView cartist;
     ImageView dp;
-    MapView trackmap;
-    Button cancel;
+    ScrollableMap trackmap;
+    Button cancel,ingredients;
 
     ArrayList<CartItem> cartItems = new ArrayList<CartItem>();
     CartListAdapter cartListAdapter;
@@ -109,7 +111,24 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
 
         cancel  = view.findViewById(R.id.cancel_button);
         cancel.setOnClickListener(canceclicked);
+
+        ingredients = view.findViewById(R.id.ing_button);
+        ingredients.setOnClickListener(ingredientsClicked);
     }
+
+    View.OnClickListener ingredientsClicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            DashboardUserActivity.activeFragment = new Ingredients(cartItems);
+
+            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+            DashboardUserActivity.activeFragment.setTargetFragment(getActivity().getSupportFragmentManager().getFragments().get(0),9999);
+            ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
+            ft.addToBackStack(null);
+
+            ft.commit();
+        }
+    };
 
     View.OnClickListener canceclicked = v -> {
         Message newm = new Message(Message.Direction.CLIENT_TO_SERVER,"CANCEL_ORDER");

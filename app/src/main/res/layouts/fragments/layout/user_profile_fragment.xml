@@ -607,7 +607,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.gms.maps.MapView
+                    <com.bawarchef.android.ScrollableMap
                         android:id="@+id/profile_location_image"
                         android:layout_width="0dp"
                         android:layout_height="0dp"

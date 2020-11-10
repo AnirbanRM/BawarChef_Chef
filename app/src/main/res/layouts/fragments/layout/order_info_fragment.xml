@@ -201,7 +201,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
-                    <com.google.android.gms.maps.MapView
+                    <com.bawarchef.android.ScrollableMap
                         android:id="@+id/location"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
@@ -286,6 +286,7 @@
                         android:backgroundTint="#3EFF9800"/>
 
                     <Button
+                        android:id="@+id/ing_button"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         app:layout_constraintEnd_toEndOf="parent"

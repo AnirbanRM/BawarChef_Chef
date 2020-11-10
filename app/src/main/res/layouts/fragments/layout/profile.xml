@@ -161,8 +161,7 @@
                 <TextView
                     android:id="@+id/gpst"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="parent"
+                    android:layout_height="wrap_content"                   app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/profile_bio_box"
                     app:layout_constraintEnd_toEndOf="parent"
                     android:text="Location"
@@ -171,7 +170,7 @@
                     android:textColor="@android:color/black"
                     android:fontFamily="@font/raleway_bolditalic"/>
 
-                <com.google.android.gms.maps.MapView
+                <com.bawarchef.android.ScrollableMap
                     android:id="@+id/profile_location_image"
                     android:layout_width="0dp"
                     android:layout_height="0dp"

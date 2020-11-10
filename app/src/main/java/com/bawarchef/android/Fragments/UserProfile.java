@@ -36,6 +36,7 @@ import com.bawarchef.android.DP_opt_dialog;
 import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.ImagePicker;
 import com.bawarchef.android.R;
+import com.bawarchef.android.ScrollableMap;
 import com.bawarchef.android.ThisApplication;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -64,7 +65,7 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
     ImageButton mod_DP,profile_upd_button;
     EditText uname,resAddr,resCity,resState,resPincode,mob,email,fname,lname;
     ImageView dp_box;
-    MapView mapView;
+    ScrollableMap mapView;
     TextView dobbox;
     ImagePicker picker;
 

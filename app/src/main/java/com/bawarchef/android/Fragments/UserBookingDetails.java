@@ -39,6 +39,7 @@ import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
 import com.bawarchef.android.R;
+import com.bawarchef.android.ScrollableMap;
 import com.bawarchef.android.ThisApplication;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -70,7 +71,7 @@ public class UserBookingDetails extends Fragment implements OnMapReadyCallback,M
     ImageView chefdp;
     TextView chefname,datebox,timebox,totalPice;
     EditText adddress;
-    MapView mapView;
+    ScrollableMap mapView;
     Button bookButton;
 
     Bitmap chefImg;

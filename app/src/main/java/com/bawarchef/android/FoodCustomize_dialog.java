@@ -84,6 +84,7 @@ public class FoodCustomize_dialog extends Activity {
             for(CustomRadioGroup customRadioGroup : radioGroups)
                 cartItem.addCustomization(customRadioGroup.getgName(),customRadioGroup.getSelectedText());
 
+            cartItem.setIngredients(((FoodNode)foodnode).getIngredients());
             ThisApplication.currentUserProfile.getCart().getCartItems().add(cartItem);
             ThisApplication.currentUserProfile.getCart().setChefID((String)chef[0]);
             ThisApplication.currentUserProfile.getCart().setChefname((String) chef[1]);
