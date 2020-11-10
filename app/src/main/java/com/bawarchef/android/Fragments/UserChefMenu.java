@@ -80,6 +80,8 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
             AsyncExecutor executor = new AsyncExecutor();
             executor.execute(ep);
         }catch (Exception e){}
+
+        DashboardUserActivity.activeFragment = this;
     }
 
     @Override

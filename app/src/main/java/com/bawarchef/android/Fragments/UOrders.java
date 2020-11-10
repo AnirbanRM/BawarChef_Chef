@@ -1,6 +1,7 @@
 package com.bawarchef.android.Fragments;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,6 +17,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,12 +27,15 @@ import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
 import com.bawarchef.Containers.Order;
 import com.bawarchef.Containers.OrderListItemClass;
+import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.R;
 import com.bawarchef.android.ThisApplication;
 
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+
+import static android.app.Activity.RESULT_OK;
 
 public class UOrders extends Fragment implements MessageReceiver{
 
@@ -70,6 +75,15 @@ public class UOrders extends Fragment implements MessageReceiver{
 
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK){
+            if(requestCode==9999){
+                DashboardUserActivity.activeFragment=this;
+            }
+        }
+    }
 
     @Override
     public void process(Message m) {
@@ -150,6 +164,15 @@ public class UOrders extends Fragment implements MessageReceiver{
                     holder.status.setText("Cancelled");
                     break;
             }
+            holder.itemView.setOnClickListener(v -> {
+                DashboardUserActivity.activeFragment = new OrderInfo(order.orderiD);
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                DashboardUserActivity.activeFragment.setTargetFragment(UOrders.this, 9999);
+                ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
+                ft.addToBackStack(null);
+                ft.commit();;
+            });
         }
 
         @Override

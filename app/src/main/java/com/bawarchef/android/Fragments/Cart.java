@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Containers.UserIdentity;
+import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
 import com.bawarchef.android.R;
@@ -31,7 +32,7 @@ import java.util.Map;
 import static android.app.Activity.RESULT_OK;
 
 
-public class Cart extends Fragment implements MessageReceiver{
+public class Cart extends Fragment{
 
     View v;
 
@@ -73,29 +74,22 @@ public class Cart extends Fragment implements MessageReceiver{
                 return;
             }
 
-            activeFragment = new UserBookingDetails();
+            DashboardUserActivity.activeFragment = new UserBookingDetails();
 
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            activeFragment.setTargetFragment(Cart.this, 9999);
-            ft.add(R.id.fragmentViewPort,activeFragment);
+            DashboardUserActivity.activeFragment.setTargetFragment(Cart.this, 9999);
+            ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
             ft.addToBackStack(null);
             ft.commit();;
         }
     };
-
-    Fragment activeFragment=null;
-    @Override
-    public void process(Message m) {
-        if(activeFragment!=null)
-            ((MessageReceiver)activeFragment).process(m);
-    }
 
    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK){
             if(requestCode==9999){
-                activeFragment=null;
+                DashboardUserActivity.activeFragment=this;
             }
         }
     }

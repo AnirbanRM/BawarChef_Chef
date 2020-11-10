@@ -23,6 +23,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,6 +35,7 @@ import com.bawarchef.Containers.ChefIdentity;
 import com.bawarchef.Containers.Order;
 import com.bawarchef.Containers.UserIdentity;
 import com.bawarchef.android.ChefPDetailsActivity;
+import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
 import com.bawarchef.android.R;
@@ -265,6 +267,8 @@ public class UserBookingDetails extends Fragment implements OnMapReadyCallback,M
         }
     };
 
+//------------------------------------------------------------------------------------------------------------------
+
     @Override
     public void process(Message m) {
         if(m.getMsg_type().equals("RESP_BOOK_ORDER")){
@@ -274,12 +278,22 @@ public class UserBookingDetails extends Fragment implements OnMapReadyCallback,M
                     dialog = null;
                 }
                 Toast.makeText(getActivity(),"Order successfully booked",Toast.LENGTH_SHORT).show();
+
+                int backStackCount = getActivity().getSupportFragmentManager().getBackStackEntryCount()-1;
+                for(int i = 0; i< backStackCount; i++)
+                    getActivity().getSupportFragmentManager().popBackStack();
+
+                DashboardUserActivity.activeFragment = new OrderInfo((String) m.getProperty("OrderID"));
+
+                FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                DashboardUserActivity.activeFragment.setTargetFragment(getActivity().getSupportFragmentManager().getFragments().get(0),9999);
+                ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
+                ft.addToBackStack(null);
+
+                ft.commit();
             });
         }
     }
-
-//------------------------------------------------------------------------------------------------------------------
-
 
 
     class CartListAdapter extends RecyclerView.Adapter<CartListAdapter.ViewHolder>{
@@ -318,6 +332,7 @@ public class UserBookingDetails extends Fragment implements OnMapReadyCallback,M
                     ThisApplication.currentUserProfile.getCart().refresh();
                 }
             });
+            holder.itemView.setTranslationZ(0);
         }
 
         @Override

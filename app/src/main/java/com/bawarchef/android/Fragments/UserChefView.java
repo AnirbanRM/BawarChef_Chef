@@ -24,6 +24,7 @@ import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
 import com.bawarchef.Containers.ChefAdvertMajorContainer;
+import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.R;
 import com.bawarchef.android.ThisApplication;
 
@@ -78,16 +79,15 @@ public class UserChefView extends Fragment implements MessageReceiver {
         }catch (Exception e){}
     }
 
-    Fragment activeFragment = null;
     Bitmap user_dp=null;
     View.OnClickListener book_Clicked = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            activeFragment = new UserChefMenu(chefID,name.getText().toString(),user_dp);
+            DashboardUserActivity.activeFragment = new UserChefMenu(chefID,name.getText().toString(),user_dp);
 
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            activeFragment.setTargetFragment(UserChefView.this,9999);
-            ft.add(R.id.fragmentViewPort,activeFragment);
+            DashboardUserActivity.activeFragment.setTargetFragment(UserChefView.this,9999);
+            ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
             ft.addToBackStack(null);
 
             ft.commit();
@@ -117,10 +117,6 @@ public class UserChefView extends Fragment implements MessageReceiver {
                 }
             });
         }
-
-        else if(activeFragment!=null){
-            ((MessageReceiver)activeFragment).process(m);
-        }
     }
 
     @Override
@@ -128,7 +124,7 @@ public class UserChefView extends Fragment implements MessageReceiver {
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK){
             if(requestCode==9999){
-                activeFragment=null;
+                DashboardUserActivity.activeFragment=this;
             }
         }
     }

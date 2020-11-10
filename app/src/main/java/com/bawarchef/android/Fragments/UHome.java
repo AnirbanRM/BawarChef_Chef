@@ -31,6 +31,7 @@ import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
 import com.bawarchef.Containers.ChefAdvertMinorContainer;
 import com.bawarchef.android.CurrentUserProfile;
+import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.R;
 import com.bawarchef.android.ThisApplication;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -39,6 +40,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Dash;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -140,13 +142,13 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
         }
     };
 
-    Fragment activeFragment = null;
+
     public void goToChef(String id){
-        activeFragment = new UserChefView(id);
+        DashboardUserActivity.activeFragment = new UserChefView(id);
 
         FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-        activeFragment.setTargetFragment(UHome.this,9999);
-        ft.add(R.id.fragmentViewPort,activeFragment);
+        DashboardUserActivity.activeFragment.setTargetFragment(UHome.this,9999);
+        ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
         ft.addToBackStack(null);
 
         ft.commit();
@@ -157,7 +159,7 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK){
             if(requestCode==9999){
-                activeFragment=null;
+                DashboardUserActivity.activeFragment = this;
             }
         }
     }
@@ -183,7 +185,7 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
     @Override
     public void process(Message m) {
 
-        if(m.getMsg_type().equals("LOCATION_CALLBACK") && activeFragment==null){
+        if(m.getMsg_type().equals("LOCATION_CALLBACK") && DashboardUserActivity.activeFragment==this){
             getData();
         }
 
@@ -201,11 +203,6 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
                 }
             });
         }
-
-        else if(activeFragment!=null){
-            ((MessageReceiver)activeFragment).process(m);
-        }
-
     }
 
     Marker selectedMarker=null;

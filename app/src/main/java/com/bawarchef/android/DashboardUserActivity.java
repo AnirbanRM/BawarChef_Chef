@@ -94,10 +94,6 @@ public class DashboardUserActivity extends AppCompatActivity {
                 ((MessageReceiver)activeFragment).process(new Message(Message.Direction.SERVER_TO_CLIENT,"LOCATION_CALLBACK"));
             }
 
-            if(cartfragment!=null){
-                ((MessageReceiver)cartfragment).process(m);
-            }
-
             if(activeFragment!=null){
                 ((MessageReceiver)activeFragment).process(m);
             }
@@ -114,7 +110,7 @@ public class DashboardUserActivity extends AppCompatActivity {
         new Thread(() -> ((ThisApplication)getApplication()).startLocationUpdates(onLocationChange)).start();
     }
 
-    Fragment activeFragment = null;
+    public static Fragment activeFragment = null;
 
     private void setFragment(MenuItem item) {
 
@@ -147,13 +143,12 @@ public class DashboardUserActivity extends AppCompatActivity {
                     .commit();
     }
 
-    Fragment cartfragment;
     View.OnClickListener cartClicked = v -> {
-        cartfragment = new Cart();
+        activeFragment = new Cart();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        cartfragment.setTargetFragment(activeFragment, 9999);
-        ft.add(R.id.fragmentViewPort,cartfragment);
+        activeFragment.setTargetFragment(getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()), 9999);
+        ft.add(R.id.fragmentViewPort,activeFragment);
         ft.addToBackStack(null);
         ft.commit();;
     };
