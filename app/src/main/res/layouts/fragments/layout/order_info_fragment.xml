@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fullbody"
     android:background="@android:color/white">
 
     <TextView
@@ -37,7 +38,9 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="match_parent"
+                android:id="@+id/testt"
+                >
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/part1"
@@ -246,7 +249,7 @@
                         app:layout_constraintTop_toBottomOf="@id/cart" />
 
                     <TextView
-                        android:id="@+id/total"
+                        android:id="@+id/basetotal"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/raleway_regular"
@@ -256,6 +259,30 @@
                         android:textColor="@android:color/black"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/cartlist" />
+
+                    <TextView
+                        android:id="@+id/totalbasePrice"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/raleway_bold"
+                        android:text="Rs. 0.00 "
+                        android:textSize="18sp"
+                        android:textColor="@android:color/black"
+                        app:layout_constraintStart_toEndOf="@id/basetotal"
+                        app:layout_constraintTop_toTopOf="@id/basetotal"
+                        app:layout_constraintBottom_toBottomOf="@id/basetotal" />
+
+                    <TextView
+                        android:id="@+id/total"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/raleway_regular"
+                        android:text="Final price : "
+                        android:textSize="18sp"
+                        android:layout_marginTop="30dp"
+                        android:textColor="@android:color/black"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/basetotal" />
 
                     <TextView
                         android:id="@+id/totalPrice"

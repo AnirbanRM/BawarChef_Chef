@@ -8,7 +8,7 @@ import java.util.Calendar;
 
 public class Order implements Serializable {
 
-    public static enum Status{PENDING,CHEF_APPROVED,CHEF_DECLINED,USER_CANCELLED,COMPLETED};
+    public static enum Status{PENDING,CHEF_APPROVED,CHEF_DECLINED,USER_CANCELLED,ONGOING,COMPLETED};
 
     String chefID, address, userID;
     double lati,longi;

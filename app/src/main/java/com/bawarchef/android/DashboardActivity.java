@@ -97,6 +97,7 @@ public class DashboardActivity extends AppCompatActivity {
         ((ThisApplication)getApplication()).setMessageProcessor(activityMessageProcessor);
         ((ThisApplication)getApplication()).setCurrentContext(this);
         new Thread(() -> ((ThisApplication)getApplication()).startLocationUpdates(onLocationChange)).start();
+        new Thread(() -> ((ThisApplication)getApplication()).startLocationSharing()).start();
     }
 
     @Override

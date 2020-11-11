@@ -2,6 +2,7 @@ package com.bawarchef.android.Fragments;
 
 import android.app.ProgressDialog;
 import android.content.res.ColorStateList;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.AsyncTask;
@@ -18,6 +19,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -27,6 +30,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
+import com.bawarchef.Containers.Order;
 import com.bawarchef.Containers.OrderSummaryItem;
 import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
@@ -37,10 +41,17 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import static android.graphics.BitmapFactory.decodeByteArray;
@@ -64,11 +75,13 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
 
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
-    TextView orderID,name,date,status,address,pricetotal;
+    TextView orderID,name,date,status,address,pricebasetotal,pricetotal;
     RecyclerView cartist;
     ImageView dp;
     ScrollableMap trackmap;
     Button cancel,ingredients;
+    ConstraintLayout mapCL;
+
 
     ArrayList<CartItem> cartItems = new ArrayList<CartItem>();
     CartListAdapter cartListAdapter;
@@ -83,9 +96,11 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         status = view.findViewById(R.id.status);
         dp = view.findViewById(R.id.dp);
         address = view.findViewById(R.id.address);
+        pricebasetotal = view.findViewById(R.id.totalbasePrice);
         pricetotal = view.findViewById(R.id.totalPrice);
         cartist = view.findViewById(R.id.cartlist);
         trackmap = view.findViewById(R.id.location);
+        mapCL = view.findViewById(R.id.part3);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -141,11 +156,12 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
     };
 
     private ProgressDialog dialog;
+    OrderSummaryItem osi;
 
     @Override
     public void process(Message m) {
         if(m.getMsg_type().equals("RESP_ORDERID_INFO")){
-            OrderSummaryItem osi = (OrderSummaryItem) m.getProperty("OrderDetail");
+            osi = (OrderSummaryItem) m.getProperty("OrderDetail");
 
             getActivity().runOnUiThread(new Runnable() {
                 @Override
@@ -178,32 +194,67 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
                 fragmentTransaction.commit();
             });
         }
+
+        if(m.getMsg_type().equals("RESP_CHEF_LOC")){
+            double lat = (double)m.getProperty("LAT");
+            double lng = (double)m.getProperty("LNG");
+            if(lat==0&&lng==0)
+                return;
+            chefLoc = new LatLng(lat,lng);
+            Log.e(String.valueOf(chefLoc.latitude),String.valueOf(chefLoc.longitude));
+            getActivity().runOnUiThread(() -> refreshMap());
+        }
+    }
+
+    boolean tracking = false;
+    public void disableTracking(){
+        tracking = false;
+        ConstraintSet cs = new ConstraintSet();
+
+        cs.clone(mapCL);
+        cs.setDimensionRatio(R.id.location,null);
+        cs.applyTo(mapCL);
+        TextView t = v.findViewById(R.id.tracking_text);
+        t.setText("Live Tracking is not available.");
+
     }
 
     private void show(OrderSummaryItem osi){
         orderID.setText(osi.orderID);
         name.setText(osi.name);
+        currentLoc = new LatLng(osi.bookingLat,osi.bookingLng);
+        refreshMap();
         date.setText(osi.datetime);
         switch(osi.status){
             case PENDING:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#F9A834")));
                 status.setText("Pending");
+                disableTracking();
                 break;
             case COMPLETED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#00FF00")));
                 status.setText("Completed");
+                disableTracking();
                 break;
             case CHEF_APPROVED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
                 status.setText("Approved");
+                tracking = true;
                 break;
             case CHEF_DECLINED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
                 status.setText("Declined");
+                disableTracking();
+                break;
+            case ONGOING:
+                status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
+                status.setText("Ongoing");
+                disableTracking();
                 break;
             case USER_CANCELLED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
                 status.setText("Cancelled");
+                disableTracking();
                 break;
         }
         if(osi.dp!=null && osi.dp.length!=0){
@@ -212,7 +263,48 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         cartItems = osi.ordereditems;
         cartListAdapter.notifyDataSetChanged();
         address.setText(osi.address);
-        pricetotal.setText(String.format("%.2f",osi.price));
+
+        double sum = 0;
+        for(CartItem c : cartItems)
+            sum+=c.getBasePrice();
+        pricebasetotal.setText(String.format("%.2f",sum));
+
+        if(osi.status== Order.Status.COMPLETED)
+            pricetotal.setText(String.format("%.2f",osi.price));
+        else
+            pricetotal.setText("--");
+
+        if(tracking)
+            getContinuousLocationUpdates();
+    }
+
+    public void getContinuousLocationUpdates(){
+        if(osi==null)return;
+
+        String datepart[] = osi.datetime.split(" ")[0].split("-");
+        String timepart[] = osi.datetime.split(" ")[1].split(":");
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Integer.parseInt(datepart[0]),Integer.parseInt(datepart[1]),Integer.parseInt(datepart[2]),Integer.parseInt(timepart[0]),Integer.parseInt(timepart[1]));
+
+        Date bookDt = calendar.getTime();
+        Date nowDt = Calendar.getInstance().getTime();
+
+        if(bookDt.getTime()-nowDt.getTime()>30*60*1000)
+            disableTracking();
+
+        new Thread(() -> {
+            while(true){
+                try {
+                    Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"GET_CHEF_LOC");
+                    m.putProperty("CHEF",osi.chefID);
+                    EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
+                    ((ThisApplication)getActivity().getApplication()).mobileClient.send(ep);
+
+                    Thread.sleep(5000);
+                }catch (Exception e){}
+            }
+        }).start();
     }
 
     class AsyncExecutor extends AsyncTask<EncryptedPayload,Void,Void> {
@@ -240,7 +332,7 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
     //------------------------------------------MAP------------------------------------------------
 
     GoogleMap gMap=null;
-
+    LatLng currentLoc,chefLoc;
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -287,19 +379,31 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         trackmap.onLowMemory();
     }
 
-    LatLng currentLocation;
-
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.gMap = googleMap;
-        /*
-        gMap.moveCamera(CameraUpdateFactory.zoomTo(18));
-        currentLocation = new LatLng(ThisApplication.currentUserProfile.getUserIdentity().lati,ThisApplication.currentUserProfile.getUserIdentity().longi);
-        gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
-        MarkerOptions options = new MarkerOptions().flat(false).position(currentLocation).draggable(false);
-        gMap.addMarker(options);
+    }
 
-         */
+    MarkerOptions chefMarker,currentMarker;
+    public void refreshMap(){
+        if(currentLoc!=null&&currentMarker==null){
+            Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.homelocation);
+            icon = Bitmap.createScaledBitmap(icon,icon.getWidth()/4,icon.getHeight()/4,false);
+            currentMarker = new MarkerOptions().flat(false).position(currentLoc).draggable(false).title("HOME").icon(BitmapDescriptorFactory.fromBitmap(icon));
+            gMap.addMarker(currentMarker);
+            gMap.moveCamera(CameraUpdateFactory.zoomTo(15));
+        }
+        if(chefLoc!=null) {
+            if(chefMarker==null) {
+                Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.cheflocation);
+                icon = Bitmap.createScaledBitmap(icon,icon.getWidth()/3,icon.getHeight()/3,false);
+                chefMarker = new MarkerOptions().flat(false).position(chefLoc).draggable(false).title("CHEF").icon(BitmapDescriptorFactory.fromBitmap(icon));
+                gMap.addMarker(chefMarker);
+            }
+            else
+                chefMarker.position(chefLoc);
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(chefLoc));
+        }
     }
 
 //------------------------------------------------------------------------------------------------------------------

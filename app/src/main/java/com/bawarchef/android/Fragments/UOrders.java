@@ -159,6 +159,10 @@ public class UOrders extends Fragment implements MessageReceiver{
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
                     holder.status.setText("Declined");
                     break;
+                case ONGOING:
+                    holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
+                    holder.status.setText("Ongoing");
+                    break;
                 case USER_CANCELLED:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
                     holder.status.setText("Cancelled");

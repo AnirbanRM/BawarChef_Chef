@@ -4,13 +4,16 @@ import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
 import android.location.Location;
+import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Message;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
 
+import com.bawarchef.Communication.EncryptedPayload;
+import com.bawarchef.Communication.Message;
+import com.bawarchef.Communication.ObjectByteCode;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.security.MessageDigest;
@@ -90,4 +93,31 @@ public class ThisApplication extends Application {
     }
 
     public static ArrayList<Object> sharableObject = new ArrayList<Object>();
+
+    public void startLocationSharing(){
+        while (true){
+            if(currentUserProfile.getChefIdentity().regNo!=null && locationEngine!=null && locationEngine.lastLocation!=null) {
+                Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "LOC_UPD");
+                m.putProperty("CHEF",currentUserProfile.getChefIdentity().regNo);
+                m.putProperty("LAT",locationEngine.lastLocation.latitude);
+                m.putProperty("LNG",locationEngine.lastLocation.longitude);
+
+                try {
+                    EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), mobileClient.getCrypto_key());
+                    AsyncSender asyncSender = new AsyncSender();
+                    asyncSender.execute(ep);
+                    Thread.sleep(5000);
+                }catch(Exception e){}
+            }
+        }
+    }
+
+    class AsyncSender extends AsyncTask<EncryptedPayload,Void,Void> {
+
+        @Override
+        protected Void doInBackground(EncryptedPayload... encryptedPayloads) {
+            mobileClient.send(encryptedPayloads[0]);
+            return null;
+        }
+    }
 }
