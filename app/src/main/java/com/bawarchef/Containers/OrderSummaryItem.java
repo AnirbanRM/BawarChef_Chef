@@ -7,16 +7,17 @@ import java.util.ArrayList;
 
 public class OrderSummaryItem implements Serializable {
 
-    public String chefID,orderID, name, datetime,address;
+    public String chefID,orderID, name, mob, datetime,address;
     public double bookingLat, bookingLng;
     public Order.Status status;
     public byte[] dp;
     public double price;
     public ArrayList<CartItem> ordereditems;
 
-    public OrderSummaryItem(String orderID, String chefID, String name, String datetime, String address, String status,byte[] dp, double price, ArrayList<CartItem> cartItems, double bookingLat, double bookingLng){
+    public OrderSummaryItem(String orderID, String chefID, String name, String mob, String datetime, String address, String status,byte[] dp, double price, ArrayList<CartItem> cartItems, double bookingLat, double bookingLng){
         this.orderID = orderID;
         this.chefID = chefID;
+        this.mob = mob;
         this.name = name;
         this.datetime = datetime;
         this.address = address;

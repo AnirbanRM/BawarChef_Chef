@@ -8,7 +8,7 @@
         <item android:id="@+id/bcasts" android:title="Broadcasts" android:icon="@drawable/broadcaat_l" android:checked="true"/>
         <item android:id="@+id/mHistory" android:title="History" android:icon="@drawable/history_l" android:checked="true"/>
         <item android:id="@+id/pDet" android:title="Personal Details" android:icon="@drawable/pdet_l" android:checked="true"/>
-        <item android:id="@+id/prefs" android:title="Preferences" android:icon="@drawable/prefs_l" android:checked="true"/>
+        <item android:id="@+id/prefs" android:title="Log out" android:icon="@drawable/eject" android:checked="true"/>
         <item android:id="@+id/qt" android:title="Quit" android:icon="@drawable/ic_baseline_close_24" android:checked="true"/>
     </group>
 

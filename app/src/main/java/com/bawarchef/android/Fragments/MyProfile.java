@@ -127,6 +127,10 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
         uname.setText(ThisApplication.currentUserProfile.getChefUName());
         name.setText(ThisApplication.currentUserProfile.getChefIdentity().fname + " " + ThisApplication.currentUserProfile.getChefIdentity().lname);
 
+        if(ThisApplication.currentUserProfile.getChefIdentity().dp!=null){
+            dp_box.setImageBitmap(BitmapFactory.decodeByteArray(ThisApplication.currentUserProfile.getChefIdentity().dp,0,ThisApplication.currentUserProfile.getChefIdentity().dp.length));
+        }
+
         specialityItems = new ArrayList<SpecialityItem>();
         specialityItems.add(SpecialityItem.getAdder("Add new highlight"));
 

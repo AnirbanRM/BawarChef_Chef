@@ -139,32 +139,37 @@ public class UOrders extends Fragment implements MessageReceiver{
             }
 
             holder.bookingDateTime.setText(order.bookingDatetime);
-            holder.price.setText(String.format("%.2f",order.price));
             holder.chefName.setText(order.chefName);
 
             switch(order.status){
                 case PENDING:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#F9A834")));
+                    holder.price.setText("");
                     holder.status.setText("Pending");
                     break;
                 case COMPLETED:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#00FF00")));
+                    holder.price.setText(String.format("%.2f",order.price));
                     holder.status.setText("Completed");
                     break;
                 case CHEF_APPROVED:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
+                    holder.price.setText("");
                     holder.status.setText("Approved");
                     break;
                 case CHEF_DECLINED:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+                    holder.price.setText("");
                     holder.status.setText("Declined");
                     break;
                 case ONGOING:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
+                    holder.price.setText("");
                     holder.status.setText("Ongoing");
                     break;
                 case USER_CANCELLED:
                     holder.status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
+                    holder.price.setText("");
                     holder.status.setText("Cancelled");
                     break;
             }

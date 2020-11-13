@@ -1,6 +1,8 @@
 package com.bawarchef.android.Fragments;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -22,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -32,6 +35,7 @@ import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
 import com.bawarchef.Containers.Order;
 import com.bawarchef.Containers.OrderSummaryItem;
+import com.bawarchef.android.DashboardActivity;
 import com.bawarchef.android.DashboardUserActivity;
 import com.bawarchef.android.Hierarchy.DataStructure.CartItem;
 import com.bawarchef.android.R;
@@ -39,49 +43,43 @@ import com.bawarchef.android.ScrollableMap;
 import com.bawarchef.android.ThisApplication;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
 
-import static android.graphics.BitmapFactory.decodeByteArray;
-
-public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageReceiver{
+public class ChefOrderInfo extends Fragment implements OnMapReadyCallback, MessageReceiver{
 
     View v;
     String orderNo;
+    Orders orders;
 
-    public OrderInfo(String orderNo){
+    public ChefOrderInfo(String orderNo,Orders orders){
+        this.orders = orders;
         this.orderNo = orderNo;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.order_info_fragment,container,false);
+        v = inflater.inflate(R.layout.chef_order_info_fragment,container,false);
         v.setVisibility(View.INVISIBLE);
         return v;
     }
 
     private static final String MAP_VIEW_BUNDLE_KEY = "MapViewBundleKey";
 
-    TextView orderID,name,date,status,mob,address,pricebasetotal,pricetotal;
+    TextView orderID,name,mobno,date,status,address,pricebasetotal;
     RecyclerView cartist;
     ImageView dp;
     ScrollableMap trackmap;
-    Button cancel,ingredients;
-    ConstraintLayout mapCL;
-
+    ConstraintLayout mapCL,controls,part2,part4;
+    Button approve,decline,startend;
 
     ArrayList<CartItem> cartItems = new ArrayList<CartItem>();
     CartListAdapter cartListAdapter;
@@ -95,13 +93,22 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         date = view.findViewById(R.id.datetime);
         status = view.findViewById(R.id.status);
         dp = view.findViewById(R.id.dp);
-        mob = view.findViewById(R.id.mob);
+        mobno = view.findViewById(R.id.mob);
         address = view.findViewById(R.id.address);
         pricebasetotal = view.findViewById(R.id.totalbasePrice);
-        pricetotal = view.findViewById(R.id.totalPrice);
         cartist = view.findViewById(R.id.cartlist);
         trackmap = view.findViewById(R.id.location);
         mapCL = view.findViewById(R.id.part3);
+        part2 = view.findViewById(R.id.part2);
+        part4 = view.findViewById(R.id.part4);
+        approve = view.findViewById(R.id.approve);
+        decline = view.findViewById(R.id.decline);
+        controls = view.findViewById(R.id.controls);
+        startend = view.findViewById(R.id.startend);
+
+        approve.setOnClickListener(approve_decline);
+        decline.setOnClickListener(approve_decline);
+        startend.setOnClickListener(startendclicked);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -124,197 +131,173 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
             AsyncExecutor executor = new AsyncExecutor("Getting your order... Please wait!");
             executor.execute(ep);
         }catch (Exception e){}
-
-        cancel  = view.findViewById(R.id.cancel_button);
-        cancel.setOnClickListener(canceclicked);
-
-        ingredients = view.findViewById(R.id.ing_button);
-        ingredients.setOnClickListener(ingredientsClicked);
     }
-
-    View.OnClickListener ingredientsClicked = new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            DashboardUserActivity.activeFragment = new Ingredients(cartItems);
-
-            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            DashboardUserActivity.activeFragment.setTargetFragment(getActivity().getSupportFragmentManager().getFragments().get(0),9999);
-            ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
-            ft.addToBackStack(null);
-
-            ft.commit();
-        }
-    };
-
-    View.OnClickListener canceclicked = v -> {
-        Message newm = new Message(Message.Direction.CLIENT_TO_SERVER,"CANCEL_ORDER");
-        newm.putProperty("ORDERID", orderNo);
-        try {
-            EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(newm), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
-            AsyncExecutor executor = new AsyncExecutor("Cancelling your order... Please wait!");
-            executor.execute(ep);
-        }catch (Exception e){}
-    };
 
     private ProgressDialog dialog;
     OrderSummaryItem osi;
 
     @Override
     public void process(Message m) {
+
         if(m.getMsg_type().equals("RESP_ORDERID_INFO")){
             osi = (OrderSummaryItem) m.getProperty("OrderDetail");
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(dialog!=null&&dialog.isShowing()) {
-                        dialog.dismiss();
-                        dialog = null;
-                    }
-                    show(osi);
-                    v.setVisibility(View.VISIBLE);
+            getActivity().runOnUiThread(() -> {
+                if(dialog!=null&&dialog.isShowing()) {
+                    dialog.dismiss();
+                    dialog = null;
                 }
+                show(osi);
+                v.setVisibility(View.VISIBLE);
             });
         }
 
-        if(m.getMsg_type().equals("RESP_ORDER_CANCEL")){
+        else if(m.getMsg_type().equals("RESP_ORDER_APPROVE_DECLINE")){
             getActivity().runOnUiThread(() -> {
-                if(m.getProperty("RESULT").equals("SUCCESS"))
-                    Toast.makeText(getActivity(),"Successfully cancelled your order !",Toast.LENGTH_SHORT).show();
-                else if(m.getProperty("RESULT").equals("FAILURE"))
-                    Toast.makeText(getActivity(),"Couldn't cancel your order. Please try again !",Toast.LENGTH_SHORT).show();
+                if(dialog!=null&&dialog.isShowing()) {
+                    dialog.dismiss();
+                    dialog = null;
+                }
+                Toast.makeText(getActivity(),m.getProperty("RESULT").equals("SUCCESS")?"Successfully updated":"Error! Please try again later",Toast.LENGTH_SHORT).show();
 
+                if(m.getProperty("RESPONSE").equals(Order.Status.CHEF_APPROVED)) {
+                    disableControl();
+                    mapCL.setVisibility(View.VISIBLE);
+                    status.setText("Approved");
+                    status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
+                    osi.status = Order.Status.CHEF_APPROVED;
+                    cartist.removeAllViews();
+                    cartListAdapter.notifyDataSetChanged();
+
+                    startend.setVisibility(View.VISIBLE);
+                }
+
+                if(m.getProperty("RESPONSE").equals(Order.Status.CHEF_DECLINED)) {
+                    disableControl();
+                    part2.setVisibility(View.INVISIBLE);
+                    part4.setVisibility(View.GONE);
+                    osi.status = Order.Status.CHEF_DECLINED;
+                    status.setText("Declined");
+                    status.setTextColor(Color.parseColor("#FF0000"));
+                }
+
+                orders.updateList(this);
+
+            });
+        }
+
+        else if(m.getMsg_type().equals("ORDER_START_STOP_RESP")){
+
+            getActivity().runOnUiThread(() -> {
                 if(dialog!=null&&dialog.isShowing()) {
                     dialog.dismiss();
                     dialog = null;
                 }
 
-                FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-                fragmentTransaction.detach(this);
-                fragmentTransaction.attach(this);
-                fragmentTransaction.commit();
+                if(m.getProperty("RESPONSE").equals("START")){
+                    status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
+                    status.setText("Ongoing");
+                    startend.setText("Stop Timer");
+                    startend.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#F44336")));
+                    osi.status = Order.Status.ONGOING;
+                }
+                else if(m.getProperty("RESPONSE").equals("STOP")){
+                    status.setTextColor(Color.GREEN);
+                    status.setText("Completed");
+                    part2.setVisibility(View.INVISIBLE);
+                    part4.setVisibility(View.GONE);
+                    mapCL.setVisibility(View.GONE);
+                    startend.setVisibility(View.GONE);
+                    osi.status = Order.Status.COMPLETED;
+                }
+
+                orders.updateList(this);
             });
         }
+    }
 
-        if(m.getMsg_type().equals("RESP_CHEF_LOC")){
-            double lat = (double)m.getProperty("LAT");
-            double lng = (double)m.getProperty("LNG");
-            if(lat==0&&lng==0)
-                return;
-            chefLoc = new LatLng(lat,lng);
-            Log.e(String.valueOf(chefLoc.latitude),String.valueOf(chefLoc.longitude));
-            getActivity().runOnUiThread(() -> refreshMap());
+    View.OnClickListener approve_decline = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Message newm = new Message(Message.Direction.CLIENT_TO_SERVER,"ORDER_APPROVE_DECLINE");
+            newm.putProperty("ORDER",osi.orderID);
+            newm.putProperty("RESPONSE",(v.getId()==approve.getId())?Order.Status.CHEF_APPROVED:Order.Status.CHEF_DECLINED);
+            newm.putProperty("CART",osi.ordereditems);
+
+            try{
+                EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(newm), ((ThisApplication)getActivity().getApplication()).mobileClient.getCrypto_key());
+                AsyncExecutor executor = new AsyncExecutor("Please wait");
+                executor.execute(ep);
+            }catch (Exception e){}
         }
-    }
+    };
 
-    boolean tracking = false;
-    public void disableTracking(){
-        tracking = false;
-        ConstraintSet cs = new ConstraintSet();
-
-        cs.clone(mapCL);
-        cs.setDimensionRatio(R.id.location,null);
-        cs.applyTo(mapCL);
-        TextView t = v.findViewById(R.id.tracking_text);
-        t.setText("Live Tracking is not available.");
-    }
-
-    private void disableCancel(){
-        cancel.setVisibility(View.GONE);
+    public void disableControl(){
+        controls.setVisibility(View.GONE);
     }
 
     private void show(OrderSummaryItem osi){
         orderID.setText(osi.orderID);
         name.setText(osi.name);
-        currentLoc = new LatLng(osi.bookingLat,osi.bookingLng);
-        mob.setText(osi.mob);
-        refreshMap();
+        mobno.setText(osi.mob);
         date.setText(osi.datetime);
         switch(osi.status){
             case PENDING:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#F9A834")));
-                status.setText("Pending");
-                disableTracking();
+                status.setText("Pending Approval");
+                mapCL.setVisibility(View.GONE);
+                startend.setVisibility(View.GONE);
                 break;
-            case COMPLETED:
-                status.setTextColor(ColorStateList.valueOf(Color.parseColor("#00FF00")));
-                status.setText("Completed");
-                disableTracking();
-                disableCancel();
-                break;
+
             case CHEF_APPROVED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
                 status.setText("Approved");
-                tracking = true;
+                disableControl();
+                startend.setText("Start Timer");
+                startend.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#4CAF50")));
                 break;
-            case CHEF_DECLINED:
-                status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
-                status.setText("Declined");
-                disableTracking();
-                cancel.setVisibility(View.GONE);
-                break;
+
             case ONGOING:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
                 status.setText("Ongoing");
-                disableTracking();
-                disableCancel();
-                break;
-            case USER_CANCELLED:
-                status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
-                status.setText("Cancelled");
-                disableTracking();
-                cancel.setVisibility(View.GONE);
+                disableControl();
+                startend.setText("Stop Timer");
+                startend.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor("#F44336")));
                 break;
         }
         if(osi.dp!=null && osi.dp.length!=0){
             dp.setImageBitmap(BitmapFactory.decodeByteArray(osi.dp,0,osi.dp.length));
         }
+
+        currentLoc = ((ThisApplication)getActivity().getApplication()).locationEngine.getLastLocation();
+        chefLoc = new LatLng(osi.bookingLat,osi.bookingLng);
+        refreshMap();
         cartItems = osi.ordereditems;
         cartListAdapter.notifyDataSetChanged();
         address.setText(osi.address);
 
-        double sum = 0;
-        for(CartItem c : cartItems)
-            sum+=c.getBasePrice();
-        pricebasetotal.setText(String.format("%.2f",sum));
-
-        if(osi.status== Order.Status.COMPLETED)
-            pricetotal.setText(String.format("%.2f",osi.price));
-        else
-            pricetotal.setText("--");
-
-        if(tracking)
-            getContinuousLocationUpdates();
+        pricebasetotal.setText(String.format("%.2f",osi.price));
     }
 
-    public void getContinuousLocationUpdates(){
-        if(osi==null)return;
+    View.OnClickListener startendclicked = v -> {
+        Message newm = new Message(Message.Direction.CLIENT_TO_SERVER,"ORDER_START_STOP");
+        newm.putProperty("ORDER",osi.orderID);
 
-        String datepart[] = osi.datetime.split(" ")[0].split("-");
-        String timepart[] = osi.datetime.split(" ")[1].split(":");
+        if(osi.status.equals(Order.Status.ONGOING))
+            newm.putProperty("RESPONSE","STOP");
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Integer.parseInt(datepart[0]),Integer.parseInt(datepart[1]),Integer.parseInt(datepart[2]),Integer.parseInt(timepart[0]),Integer.parseInt(timepart[1]));
+        else if(osi.status.equals(Order.Status.CHEF_APPROVED))
+            newm.putProperty("RESPONSE","START");
 
-        Date bookDt = calendar.getTime();
-        Date nowDt = Calendar.getInstance().getTime();
+        try{
+            EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(newm), ((ThisApplication)getActivity().getApplication()).mobileClient.getCrypto_key());
+            AsyncExecutor executor = new AsyncExecutor("Please wait...");
+            executor.execute(ep);
+        }catch (Exception e){}
 
-        if(bookDt.getTime()-nowDt.getTime()>30*60*1000)
-            disableTracking();
 
-        new Thread(() -> {
-            while(true){
-                try {
-                    Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"GET_CHEF_LOC");
-                    m.putProperty("CHEF",osi.chefID);
-                    EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
-                    ((ThisApplication)getActivity().getApplication()).mobileClient.send(ep);
+    };
 
-                    Thread.sleep(5000);
-                }catch (Exception e){}
-            }
-        }).start();
-    }
 
     class AsyncExecutor extends AsyncTask<EncryptedPayload,Void,Void> {
 
@@ -422,15 +405,19 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
 
         @NonNull
         @Override
-        public CartListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View v = LayoutInflater
                     .from(parent.getContext())
-                    .inflate(R.layout.cart_item_design_no_del_design,parent,false);
-            return new CartListAdapter.ViewHolder(v);
+                    .inflate(R.layout.chef_cart_item_design,parent,false);
+            return new ViewHolder(v);
+        }
+
+        private void disableScaling(TextView t){
+            t.setVisibility(View.INVISIBLE);
         }
 
         @Override
-        public void onBindViewHolder(@NonNull CartListAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             CartItem cartI = cartItems.get(position);
             holder.fName.setText(cartI.getFoodName());
             holder.qty.setText(cartI.getQuantity());
@@ -447,6 +434,22 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
 
             holder.customization.setText(customization.toString());
             holder.itemView.setTranslationZ(0);
+
+            if(osi.status.equals(Order.Status.CHEF_APPROVED)||osi.status.equals(Order.Status.ONGOING))
+                disableScaling(holder.scale);
+
+            if(osi.status.equals(Order.Status.PENDING)) {
+                holder.scale.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        FragmentManager fm = getActivity().getSupportFragmentManager();
+                        ScaleIngredient si = new ScaleIngredient(holder.fName.getText().toString(), holder.qty.getText().toString(), holder.customization.getText().toString(), cartI.getIngredients());
+                        si.show(fm, null);
+                        cartI.getIngredients();
+                    }
+                });
+            }
         }
 
         @Override
@@ -461,6 +464,7 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
             TextView price;
             TextView qty;
             TextView customization;
+            TextView scale;
 
             public ViewHolder(@NonNull View itemView) {
                 super(itemView);
@@ -470,6 +474,7 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
                 price = itemView.findViewById(R.id.price);
                 qty = itemView.findViewById(R.id.qty);
                 customization = itemView.findViewById(R.id.customization);
+                scale = itemView.findViewById(R.id.scale);
             }
         }
     }

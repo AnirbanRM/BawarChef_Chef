@@ -61,8 +61,7 @@ public abstract class AuthenticationManager {
 
         }
 
-        private byte[] arrayxor(byte[
-                ] a,byte[] b){
+        private byte[] arrayxor(byte[] a,byte[] b){
             byte[] t = new byte[a.length];
             for(int i = 0 ; i< t.length; i++)
                 t[i] = (byte) (a[i] ^ b[i]);

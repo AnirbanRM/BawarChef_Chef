@@ -4,14 +4,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -31,7 +29,6 @@ import com.bawarchef.android.Fragments.MessageReceiver;
 import com.bawarchef.android.Fragments.MyProfile;
 import com.bawarchef.android.Fragments.Orders;
 import com.bawarchef.android.Fragments.PersonalDetails;
-import com.bawarchef.android.Fragments.Preferences;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.navigation.NavigationView;
 
@@ -106,7 +103,7 @@ public class DashboardActivity extends AppCompatActivity {
         ((ThisApplication)getApplication()).setMessageProcessor(defaultMessageProcessor);
     }
 
-    Fragment activeFragment = null;
+    public static Fragment activeFragment = null;
 
     private void setFragment(MenuItem item) {
         activeFragment = null;
@@ -141,8 +138,18 @@ public class DashboardActivity extends AppCompatActivity {
                 activeFragment = new PersonalDetails();
                 break;
 
-            case "Preferences":
-                activeFragment = new Preferences();
+            case "Log out":
+                try {
+                    ((ThisApplication) getApplication()).mobileClient.closeConnection();
+                }catch (Exception e){}
+                ((ThisApplication) getApplication()).mobileClient = new MobileClient((ThisApplication) getApplication());
+                ThisApplication.currentUserProfile = new CurrentUserProfile(getApplication());
+                ((ThisApplication)getApplication()).setCryptoKey();
+
+                getApplicationContext().getSharedPreferences("BawarChef_CHEF_AppData", 0).edit().clear().apply();
+                Intent i = new Intent(DashboardActivity.this,MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
                 break;
 
             case "Quit":
@@ -164,7 +171,6 @@ public class DashboardActivity extends AppCompatActivity {
             super.onBackPressed();
         else{
             getSupportFragmentManager().popBackStack();
-            Fragment f = getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()-1);
         }
     }
 
