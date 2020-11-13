@@ -96,6 +96,8 @@ public class ThisApplication extends Application {
 
     public void startLocationSharing(){
         while (true){
+            if(currentUserProfile.getChefIdentity()==null)
+                break;
             if(currentUserProfile.getChefIdentity().regNo!=null && locationEngine!=null && locationEngine.lastLocation!=null) {
                 Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "LOC_UPD");
                 m.putProperty("CHEF",currentUserProfile.getChefIdentity().regNo);

@@ -12,5 +12,4 @@
         parent="Widget.Design.BottomNavigationView">
         <item name="fontFamily">@font/raleway_bold</item>
     </style>
-
 </resources>

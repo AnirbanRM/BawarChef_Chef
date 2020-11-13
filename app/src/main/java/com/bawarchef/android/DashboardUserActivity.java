@@ -6,6 +6,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,7 +22,6 @@ import com.bawarchef.android.Fragments.Cart;
 import com.bawarchef.android.Fragments.MessageReceiver;
 import com.bawarchef.android.Fragments.UHome;
 import com.bawarchef.android.Fragments.UOrders;
-import com.bawarchef.android.Fragments.UPreferences;
 import com.bawarchef.android.Fragments.UserProfile;
 import com.bawarchef.android.Hierarchy.DataStructure.CartContainer;
 import com.google.android.gms.maps.model.LatLng;
@@ -128,8 +128,18 @@ public class DashboardUserActivity extends AppCompatActivity {
                 activeFragment = new UOrders();
                 break;
 
-            case "Preferences":
-                activeFragment = new UPreferences();
+            case "Log out":
+                try {
+                    ((ThisApplication) getApplication()).mobileClient.closeConnection();
+                }catch (Exception e){}
+                ((ThisApplication) getApplication()).mobileClient = new MobileClient((ThisApplication) getApplication());
+                ThisApplication.currentUserProfile = new CurrentUserProfile(getApplication());
+                ((ThisApplication)getApplication()).setCryptoKey();
+
+                getApplicationContext().getSharedPreferences("BawarChef_USER_AppData", 0).edit().clear().apply();
+                Intent i = new Intent(DashboardUserActivity.this,MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(i);
                 break;
 
             case "Quit":
@@ -165,7 +175,6 @@ public class DashboardUserActivity extends AppCompatActivity {
             super.onBackPressed();
         else{
             getSupportFragmentManager().popBackStack();
-            //getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()-1).onResume();
         }
     }
 
