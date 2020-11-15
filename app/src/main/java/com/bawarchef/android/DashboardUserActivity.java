@@ -7,10 +7,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.content.Intent;
+import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bawarchef.Communication.EncryptedPayload;
@@ -34,6 +37,7 @@ public class DashboardUserActivity extends AppCompatActivity {
     DrawerLayout drawer;
     NavigationView navView;
     ImageButton menu_but,cartButton;
+    ImageView profile_pic;
     TextView area_circ,navDrUName,navDrName;
     TextView cartcount;
 
@@ -56,10 +60,15 @@ public class DashboardUserActivity extends AppCompatActivity {
         View headerView = navView.getHeaderView(0);
         navDrName = (TextView) headerView.findViewById(R.id.nav_hdr_name);
         navDrUName = (TextView) headerView.findViewById(R.id.nav_hdr_uname);
+        profile_pic = headerView.findViewById(R.id.profile_pic);
 
         UserIdentity ui = ThisApplication.currentUserProfile.getUserIdentity();
         navDrUName.setText(ThisApplication.currentUserProfile.getUserUName());
         navDrName.setText(ui.fname + " " + ui.lname);
+
+        if(ui.dp!=null){
+            profile_pic.setImageBitmap(BitmapFactory.decodeByteArray(ui.dp,0,ui.dp.length));
+        }
 
         menu_but.setOnClickListener(v -> drawer.openDrawer(GravityCompat.START,true));
 
@@ -171,8 +180,9 @@ public class DashboardUserActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()==0)
+        if(getSupportFragmentManager().getBackStackEntryCount()==0) {
             super.onBackPressed();
+        }
         else{
             getSupportFragmentManager().popBackStack();
         }

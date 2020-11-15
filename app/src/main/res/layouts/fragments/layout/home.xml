@@ -131,6 +131,7 @@
                         android:textColor="@android:color/black" />
 
                     <TextView
+                        android:id="@+id/fulfilledbox"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintTop_toTopOf="parent"
@@ -151,8 +152,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
-            </LinearLayout>
+                android:layout_weight="0.5"></LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -176,6 +176,7 @@
                         android:textColor="@android:color/black" />
 
                     <TextView
+                        android:id="@+id/pendingbox"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintTop_toTopOf="parent"
@@ -204,7 +205,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.5">
             </LinearLayout>
 
             <LinearLayout
@@ -229,6 +230,7 @@
                         android:textColor="@android:color/black" />
 
                     <TextView
+                        android:id="@+id/scorebox"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintTop_toTopOf="parent"
@@ -248,7 +250,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
+                android:layout_weight="0.5">
             </LinearLayout>
 
         </LinearLayout>
@@ -281,6 +283,7 @@
                         android:textColor="@android:color/black" />
 
                     <TextView
+                        android:id="@+id/ratingbox"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintTop_toTopOf="parent"
@@ -301,8 +304,7 @@
             <LinearLayout
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:layout_weight="1">
-            </LinearLayout>
+                android:layout_weight="0.5"></LinearLayout>
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -326,6 +328,7 @@
                         android:textColor="@android:color/black" />
 
                     <TextView
+                        android:id="@+id/rankbox"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         app:layout_constraintTop_toTopOf="parent"

@@ -32,7 +32,7 @@ import java.util.Map;
 import static android.app.Activity.RESULT_OK;
 
 
-public class Cart extends Fragment{
+public class Cart extends Fragment implements MessageReceiver{
 
     View v;
 
@@ -92,6 +92,11 @@ public class Cart extends Fragment{
                 DashboardUserActivity.activeFragment=this;
             }
         }
+    }
+
+    @Override
+    public void process(Message m) {
+        
     }
 
     class CartListAdapter extends RecyclerView.Adapter<CartListAdapter.ViewHolder>{

@@ -26,6 +26,7 @@ public class SplashActivity extends AppCompatActivity {
 
         Permissions p =Permissions.getInstance(this);
         p.grantFromUser(permissionRequestCode);
+
         ((ThisApplication) getApplication()).setCryptoKey();
 
         SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData",Context.MODE_PRIVATE);

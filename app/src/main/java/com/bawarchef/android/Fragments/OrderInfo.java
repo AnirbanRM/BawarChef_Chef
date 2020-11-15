@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -80,7 +81,8 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
     ImageView dp;
     ScrollableMap trackmap;
     Button cancel,ingredients;
-    ConstraintLayout mapCL;
+    ConstraintLayout mapCL,rating;
+    ImageView[] rating_star;
 
 
     ArrayList<CartItem> cartItems = new ArrayList<CartItem>();
@@ -102,6 +104,12 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         cartist = view.findViewById(R.id.cartlist);
         trackmap = view.findViewById(R.id.location);
         mapCL = view.findViewById(R.id.part3);
+
+        rating = view.findViewById(R.id.rating);
+        rating_star = new ImageView[]{view.findViewById(R.id.s1),view.findViewById(R.id.s2),view.findViewById(R.id.s3),view.findViewById(R.id.s4),view.findViewById(R.id.s5)};
+
+        for(ImageView i : rating_star)
+            i.setOnClickListener(ratingchanged);
 
         Bundle mapViewBundle = null;
         if (savedInstanceState != null) {
@@ -132,18 +140,36 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         ingredients.setOnClickListener(ingredientsClicked);
     }
 
-    View.OnClickListener ingredientsClicked = new View.OnClickListener() {
+    View.OnClickListener ratingchanged = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            DashboardUserActivity.activeFragment = new Ingredients(cartItems);
+            for(int i = 0; i< rating_star.length; i++)
+                rating_star[i].setImageTintList(ColorStateList.valueOf(Color.parseColor("#BDBDBD")));
+            int i = 0;
+            do
+                rating_star[i++].setImageTintList(ColorStateList.valueOf(Color.parseColor("#FF9800")));
+            while(v.getId()!=rating_star[i-1].getId());
 
-            FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
-            DashboardUserActivity.activeFragment.setTargetFragment(getActivity().getSupportFragmentManager().getFragments().get(0),9999);
-            ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
-            ft.addToBackStack(null);
-
-            ft.commit();
+            try {
+                Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "ORDER_RATING");
+                m.putProperty("ORDER",osi.orderID);
+                m.putProperty("RATING",i);
+                EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
+                AsyncExecutor executor = new AsyncExecutor("Rating your order... Please wait !");
+                executor.execute(ep);
+            }catch (Exception e){}
         }
+    };
+
+    View.OnClickListener ingredientsClicked = v -> {
+        DashboardUserActivity.activeFragment = new Ingredients(cartItems);
+
+        FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+        DashboardUserActivity.activeFragment.setTargetFragment(getActivity().getSupportFragmentManager().getFragments().get(0),9999);
+        ft.add(R.id.fragmentViewPort,DashboardUserActivity.activeFragment);
+        ft.addToBackStack(null);
+
+        ft.commit();
     };
 
     View.OnClickListener canceclicked = v -> {
@@ -164,16 +190,13 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         if(m.getMsg_type().equals("RESP_ORDERID_INFO")){
             osi = (OrderSummaryItem) m.getProperty("OrderDetail");
 
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    if(dialog!=null&&dialog.isShowing()) {
-                        dialog.dismiss();
-                        dialog = null;
-                    }
-                    show(osi);
-                    v.setVisibility(View.VISIBLE);
+            getActivity().runOnUiThread(() -> {
+                if(dialog!=null&&dialog.isShowing()) {
+                    dialog.dismiss();
+                    dialog = null;
                 }
+                show(osi);
+                v.setVisibility(View.VISIBLE);
             });
         }
 
@@ -205,6 +228,20 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
             Log.e(String.valueOf(chefLoc.latitude),String.valueOf(chefLoc.longitude));
             getActivity().runOnUiThread(() -> refreshMap());
         }
+
+        if(m.getMsg_type().equals("RESP_ORDER_RATING")){
+            getActivity().runOnUiThread(() -> {
+                if(m.getProperty("RESULT").equals("SUCCESS"))
+                    Toast.makeText(getActivity(),"Successfully rated !",Toast.LENGTH_SHORT).show();
+                else if(m.getProperty("RESULT").equals("FAILURE"))
+                    Toast.makeText(getActivity(),"Couldn't rate your order. Please try again !",Toast.LENGTH_SHORT).show();
+
+                if(dialog!=null&&dialog.isShowing()) {
+                    dialog.dismiss();
+                    dialog = null;
+                }
+            });
+        }
     }
 
     boolean tracking = false;
@@ -235,35 +272,49 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#F9A834")));
                 status.setText("Pending");
                 disableTracking();
+                rating.setVisibility(View.GONE);
+                ingredients.setVisibility(View.GONE);
                 break;
             case COMPLETED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#00FF00")));
                 status.setText("Completed");
                 disableTracking();
                 disableCancel();
+
+                if(osi.rating!=-1){
+                    for(int i = 0;i< osi.rating; i++)
+                        rating_star[i].setImageTintList(ColorStateList.valueOf(Color.parseColor("#FF9800")));
+                }
                 break;
             case CHEF_APPROVED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
                 status.setText("Approved");
                 tracking = true;
+                rating.setVisibility(View.GONE);
+                ingredients.setVisibility(View.GONE);
                 break;
             case CHEF_DECLINED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
                 status.setText("Declined");
                 disableTracking();
                 cancel.setVisibility(View.GONE);
+                rating.setVisibility(View.GONE);
+                ingredients.setVisibility(View.GONE);
                 break;
             case ONGOING:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#0000FF")));
                 status.setText("Ongoing");
                 disableTracking();
                 disableCancel();
+                rating.setVisibility(View.GONE);
                 break;
             case USER_CANCELLED:
                 status.setTextColor(ColorStateList.valueOf(Color.parseColor("#FF0000")));
                 status.setText("Cancelled");
                 disableTracking();
                 cancel.setVisibility(View.GONE);
+                rating.setVisibility(View.GONE);
+                ingredients.setVisibility(View.GONE);
                 break;
         }
         if(osi.dp!=null && osi.dp.length!=0){
@@ -299,7 +350,7 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         Date bookDt = calendar.getTime();
         Date nowDt = Calendar.getInstance().getTime();
 
-        if(bookDt.getTime()-nowDt.getTime()>30*60*1000)
+        if(bookDt.getTime()-nowDt.getTime()<30*60)
             disableTracking();
 
         new Thread(() -> {

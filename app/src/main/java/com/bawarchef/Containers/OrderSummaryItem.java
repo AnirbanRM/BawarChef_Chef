@@ -12,9 +12,10 @@ public class OrderSummaryItem implements Serializable {
     public Order.Status status;
     public byte[] dp;
     public double price;
+    public double rating;
     public ArrayList<CartItem> ordereditems;
 
-    public OrderSummaryItem(String orderID, String chefID, String name, String mob, String datetime, String address, String status,byte[] dp, double price, ArrayList<CartItem> cartItems, double bookingLat, double bookingLng){
+    public OrderSummaryItem(String orderID, String chefID, String name, String mob, String datetime, String address, String status,byte[] dp, double price, ArrayList<CartItem> cartItems, double bookingLat, double bookingLng,double rating){
         this.orderID = orderID;
         this.chefID = chefID;
         this.mob = mob;
@@ -27,5 +28,6 @@ public class OrderSummaryItem implements Serializable {
         this.price = price;
         this.bookingLat = bookingLat;
         this.bookingLng = bookingLng;
+        this.rating = rating;
     }
 }

@@ -3,19 +3,27 @@ package com.bawarchef.android;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
 import com.bawarchef.Communication.ObjectByteCode;
+import com.bawarchef.Containers.ChefIdentity;
+import com.bawarchef.Containers.UserIdentity;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -96,6 +104,9 @@ public class ThisApplication extends Application {
 
     public void startLocationSharing(){
         while (true){
+            try{
+                Thread.sleep(5000);
+            }catch (Exception e){}
             if(currentUserProfile.getChefIdentity()==null)
                 break;
             if(currentUserProfile.getChefIdentity().regNo!=null && locationEngine!=null && locationEngine.lastLocation!=null) {
@@ -108,7 +119,6 @@ public class ThisApplication extends Application {
                     EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), mobileClient.getCrypto_key());
                     AsyncSender asyncSender = new AsyncSender();
                     asyncSender.execute(ep);
-                    Thread.sleep(5000);
                 }catch(Exception e){}
             }
         }
@@ -121,5 +131,96 @@ public class ThisApplication extends Application {
             mobileClient.send(encryptedPayloads[0]);
             return null;
         }
+    }
+
+    public void reEstablish(){
+        Log.e("REESTABLISH","RETRYING");
+        mobileClient = new MobileClient(this);
+
+        setCryptoKey();
+        SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData",Context.MODE_PRIVATE);
+        SharedPreferences sharedPref2 = getSharedPreferences("BawarChef_USER_AppData",Context.MODE_PRIVATE);
+
+        String unameChef = sharedPref1.getString("UNAME", null);
+        String pwdChef = sharedPref1.getString("PWD", null);
+        String unameUser = sharedPref2.getString("UNAME", null);
+        String pwdUser = sharedPref2.getString("PWD", null);
+
+        if(unameChef!=null){
+            ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
+            ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
+            ThisApplication.currentUserProfile.setChefUName(unameChef);
+
+            ThisApplication.currentUserProfile.setPassword(pwdChef);
+
+            final String pwd2 = pwdChef;
+            new Thread(()->{
+                try {
+                    mobileClient.initialSocketSetup();
+                } catch (IOException e) {
+                    Log.e("SOCKET","NOT ESTAB");
+                    try {
+                        Thread.sleep(4000);
+                    }catch (Exception e2){}
+                    reEstablish();
+                    return;
+                }
+
+                AuthenticationManager authenticationManager = new AuthenticationManager(mobileClient) {
+                    @Override
+                    public void onSuccessResponse(Message m) {
+                        ThisApplication.currentUserProfile.setChefIdentity((ChefIdentity) m.getProperty("CHEF_IDENTITY"));
+                        setMessageProcessor(((DashboardActivity)currentContext).activityMessageProcessor);
+                    }
+
+                    @Override
+                    public void onFailureResponse(Message m) { }
+                };
+
+                authenticationManager.waitAndWork();
+                new Thread(()->mobileClient.startListening()).start();
+            }).start();
+        }
+        else if(unameUser!=null){
+            mobileClient.setDefaultCryptoKey();
+            ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
+            ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
+            ThisApplication.currentUserProfile.setUserUName(unameUser);
+
+            ThisApplication.currentUserProfile.setPassword(pwdUser);
+
+            final String pwd2 = pwdUser;
+            new Thread(()->{
+                try {
+                    mobileClient.initialSocketSetup();
+                } catch (IOException e) {
+                    Log.e("SOCKET","NOT ESTAB");
+                    try {
+                        Thread.sleep(4000);
+                    }catch (Exception e2){}
+                    reEstablish();
+                    return;
+                }
+
+                AuthenticationManager authenticationManager = new AuthenticationManager(mobileClient) {
+                    @Override
+                    public void onSuccessResponse(Message m) {
+                        ThisApplication.currentUserProfile.setUserIdentity((UserIdentity) m.getProperty("USER_IDENTITY"));
+                        setMessageProcessor(((DashboardUserActivity)currentContext).activityMessageProcessor);
+                    }
+
+                    @Override
+                    public void onFailureResponse(Message m) { }
+                };
+
+                authenticationManager.waitAndWork();
+                mobileClient.startListening();
+            }).start();
+
+        }
+
+
+
+
     }
 }

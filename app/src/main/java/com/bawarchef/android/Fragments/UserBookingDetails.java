@@ -117,7 +117,7 @@ public class UserBookingDetails extends Fragment implements OnMapReadyCallback,M
         timebox.setOnClickListener(timeboxcl);
 
         Calendar c = Calendar.getInstance();
-        datebox.setText(c.get(Calendar.DATE)+"/"+c.get(Calendar.MONTH)+"/"+c.get(Calendar.YEAR));
+        datebox.setText(c.get(Calendar.DATE)+"/"+ (c.get(Calendar.MONTH)+1)+"/"+c.get(Calendar.YEAR));
         timebox.setText(c.get(Calendar.HOUR_OF_DAY)+":"+c.get(Calendar.MINUTE));
 
         LinearLayoutManager recyMngr = new LinearLayoutManager(
@@ -331,6 +331,7 @@ public class UserBookingDetails extends Fragment implements OnMapReadyCallback,M
                     cartContainer.getCartItems().remove(position);
                     adapter.notifyDataSetChanged();
                     ThisApplication.currentUserProfile.getCart().refresh();
+                    totalPice.setText(String.format("%.2f",cartContainer.getCartPrice()));
                 }
             });
             holder.itemView.setTranslationZ(0);

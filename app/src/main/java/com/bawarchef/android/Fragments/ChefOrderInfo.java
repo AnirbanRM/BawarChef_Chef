@@ -379,17 +379,17 @@ public class ChefOrderInfo extends Fragment implements OnMapReadyCallback, Messa
     MarkerOptions chefMarker,currentMarker;
     public void refreshMap(){
         if(currentLoc!=null&&currentMarker==null){
-            Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.homelocation);
-            icon = Bitmap.createScaledBitmap(icon,icon.getWidth()/4,icon.getHeight()/4,false);
-            currentMarker = new MarkerOptions().flat(false).position(currentLoc).draggable(false).title("HOME").icon(BitmapDescriptorFactory.fromBitmap(icon));
+            Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.cheflocation);
+            icon = Bitmap.createScaledBitmap(icon,icon.getWidth()/3,icon.getHeight()/3,false);
+            currentMarker = new MarkerOptions().flat(false).position(currentLoc).draggable(false).title("CHEF").icon(BitmapDescriptorFactory.fromBitmap(icon));
             gMap.addMarker(currentMarker);
             gMap.moveCamera(CameraUpdateFactory.zoomTo(15));
         }
         if(chefLoc!=null) {
             if(chefMarker==null) {
-                Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.cheflocation);
-                icon = Bitmap.createScaledBitmap(icon,icon.getWidth()/3,icon.getHeight()/3,false);
-                chefMarker = new MarkerOptions().flat(false).position(chefLoc).draggable(false).title("CHEF").icon(BitmapDescriptorFactory.fromBitmap(icon));
+                Bitmap icon = BitmapFactory.decodeResource(getResources(),R.drawable.homelocation);
+                icon = Bitmap.createScaledBitmap(icon,icon.getWidth()/4,icon.getHeight()/4,false);
+                chefMarker = new MarkerOptions().flat(false).position(chefLoc).draggable(false).title("HOME").icon(BitmapDescriptorFactory.fromBitmap(icon));
                 gMap.addMarker(chefMarker);
             }
             else

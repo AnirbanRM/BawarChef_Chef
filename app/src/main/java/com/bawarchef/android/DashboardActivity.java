@@ -8,11 +8,13 @@ import androidx.fragment.app.Fragment;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +41,7 @@ public class DashboardActivity extends AppCompatActivity {
     DrawerLayout drawer;
     NavigationView navView;
     ImageButton menu_but;
+    ImageView profilepic;
     TextView area_circ,navDrUName,navDrName;
 
     MobileClient.MessageProcessor defaultMessageProcessor;
@@ -58,10 +61,15 @@ public class DashboardActivity extends AppCompatActivity {
         View headerView = navView.getHeaderView(0);
         navDrName = headerView.findViewById(R.id.nav_hdr_name);
         navDrUName = headerView.findViewById(R.id.nav_hdr_uname);
+        profilepic = headerView.findViewById(R.id.profile_pic);
 
         ChefIdentity ci = ThisApplication.currentUserProfile.getChefIdentity();
         navDrUName.setText(ThisApplication.currentUserProfile.getChefUName());
         navDrName.setText(ci.fname + " " + ci.lname);
+
+        if(ci.dp!=null){
+            profilepic.setImageBitmap(BitmapFactory.decodeByteArray(ci.dp,0,ci.dp.length));
+        }
 
         menu_but.setOnClickListener(v -> drawer.openDrawer(GravityCompat.START,true));
 
@@ -101,6 +109,14 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ((ThisApplication)getApplication()).setMessageProcessor(defaultMessageProcessor);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        try {
+            ((ThisApplication) getApplication()).mobileClient.closeConnection();
+        }catch (Exception e){}
     }
 
     public static Fragment activeFragment = null;
@@ -167,8 +183,9 @@ public class DashboardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        if(getSupportFragmentManager().getBackStackEntryCount()==0)
+        if(getSupportFragmentManager().getBackStackEntryCount()==0) {
             super.onBackPressed();
+        }
         else{
             getSupportFragmentManager().popBackStack();
         }

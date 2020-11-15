@@ -25,7 +25,7 @@ import java.security.MessageDigest;
 public class MobileClient {
 
     private ThisApplication appRef;
-    private Socket sock;
+    private static Socket sock;
     private ObjectInputStream iStream;
     private ObjectOutputStream oStream;
 
@@ -58,13 +58,17 @@ public class MobileClient {
         crypto_key =  md5.digest(appRef.getString(R.string.D_KEY_0).getBytes());
     }
 
-    private void initialSocketSetup() throws IOException {
+
+    public void initialSocketSetup() throws IOException {
         sock = new Socket(appRef.getString(R.string.SERVER_ADDRESS),Integer.parseInt(appRef.getString(R.string.COMMUNICATION_PORT)));
         oStream = new ObjectOutputStream(sock.getOutputStream());
         iStream = new ObjectInputStream(sock.getInputStream());
     }
 
     void connect(String regNo){
+        params = null;
+        setDefaultCryptoKey();
+        ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.UNREGISTERED);
         ThisApplication.currentUserProfile.setRegNo(regNo);
         new Thread(()->{
@@ -96,6 +100,9 @@ public class MobileClient {
     }
 
     void connect(String uname,String pwd,boolean pwdHashed){
+        params = new Object[]{uname,pwd,pwdHashed};
+        setDefaultCryptoKey();
+        ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
         ThisApplication.currentUserProfile.setChefUName(uname);
 
@@ -145,6 +152,8 @@ public class MobileClient {
     }
 
     void connectAsCusto(){
+        params = null;
+        setDefaultCryptoKey();
         ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.UNREGISTERED);
 
@@ -186,6 +195,8 @@ public class MobileClient {
     }
 
     void connectAsCusto(String uname,String pwd,boolean pwdHashed){
+        params = new Object[]{uname,pwd,pwdHashed};
+        setDefaultCryptoKey();
         ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
         ThisApplication.currentUserProfile.setUserUName(uname);
@@ -230,7 +241,6 @@ public class MobileClient {
             };
 
             authenticationManager.waitAndWork();
-
             startListening();
         }).start();
     }
@@ -253,7 +263,9 @@ public class MobileClient {
         return messageProcessor;
     }
 
-    private void startListening() {
+    Object params[];
+    public void startListening() {
+        if(sock==null)return;
         while(!sock.isClosed()){
             try {
                 EncryptedPayload p = (EncryptedPayload) iStream.readObject();
@@ -267,6 +279,7 @@ public class MobileClient {
                 break;
             }
         }
+        appRef.reEstablish();
     }
 
     public byte[] getCrypto_key() {
@@ -298,8 +311,10 @@ public class MobileClient {
 
     public void send(EncryptedPayload encryptedPayload){
         try{
+            if(sock.isClosed())return;
             oStream.writeUnshared(encryptedPayload);
-        }catch (Exception e){}
+            oStream.reset();
+        }catch (Exception e){ }
     }
 
     private static String getHex(byte[] arr) {
