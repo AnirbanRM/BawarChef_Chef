@@ -20,12 +20,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.security.MessageDigest;
 
 public class MobileClient {
 
     private ThisApplication appRef;
-    private static Socket sock;
+    private Socket sock;
     private ObjectInputStream iStream;
     private ObjectOutputStream oStream;
 
@@ -47,6 +48,7 @@ public class MobileClient {
                 Log.e("HANDLED",m.getMsg_type());
             }
         };
+        //Setting default crypto key...
         setDefaultCryptoKey();
     }
 
@@ -61,13 +63,12 @@ public class MobileClient {
 
     public void initialSocketSetup() throws IOException {
         sock = new Socket(appRef.getString(R.string.SERVER_ADDRESS),Integer.parseInt(appRef.getString(R.string.COMMUNICATION_PORT)));
+        sock.setSoTimeout(2000);
         oStream = new ObjectOutputStream(sock.getOutputStream());
         iStream = new ObjectInputStream(sock.getInputStream());
     }
 
     void connect(String regNo){
-        params = null;
-        setDefaultCryptoKey();
         ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.UNREGISTERED);
         ThisApplication.currentUserProfile.setRegNo(regNo);
@@ -100,8 +101,6 @@ public class MobileClient {
     }
 
     void connect(String uname,String pwd,boolean pwdHashed){
-        params = new Object[]{uname,pwd,pwdHashed};
-        setDefaultCryptoKey();
         ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
         ThisApplication.currentUserProfile.setChefUName(uname);
@@ -152,8 +151,6 @@ public class MobileClient {
     }
 
     void connectAsCusto(){
-        params = null;
-        setDefaultCryptoKey();
         ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.UNREGISTERED);
 
@@ -195,8 +192,6 @@ public class MobileClient {
     }
 
     void connectAsCusto(String uname,String pwd,boolean pwdHashed){
-        params = new Object[]{uname,pwd,pwdHashed};
-        setDefaultCryptoKey();
         ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
         ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
         ThisApplication.currentUserProfile.setUserUName(uname);
@@ -265,21 +260,20 @@ public class MobileClient {
 
     Object params[];
     public void startListening() {
-        if(sock==null)return;
-        while(!sock.isClosed()){
+        while(sock!=null && !sock.isClosed()){
             try {
                 EncryptedPayload p = (EncryptedPayload) iStream.readObject();
                 Message o = p.getDecryptedPayload(crypto_key);
                 messageQueue.addToQueue(o);
             } catch (Exception e) {
+                if(e instanceof SocketTimeoutException)
+                    continue;
                 Log.e("ERROR",e.toString());
                 try {
                     closeConnection();
                 }catch (Exception e2){}
-                break;
             }
         }
-        appRef.reEstablish();
     }
 
     public byte[] getCrypto_key() {
@@ -305,13 +299,19 @@ public class MobileClient {
     };
 
     public void closeConnection() throws Exception{
-        MobileClient.this.sock.close();
+        try{
+            sock.close();
+        }catch(Exception e){}
+        sock = null;
     }
 
 
     public void send(EncryptedPayload encryptedPayload){
+        if(sock==null){
+            appRef.reEstablish(encryptedPayload);
+            return;
+        }
         try{
-            if(sock.isClosed())return;
             oStream.writeUnshared(encryptedPayload);
             oStream.reset();
         }catch (Exception e){ }

@@ -27,6 +27,9 @@ public class SplashActivity extends AppCompatActivity {
         Permissions p =Permissions.getInstance(this);
         p.grantFromUser(permissionRequestCode);
 
+        //Setting key to current user profile...
+        ((ThisApplication)getApplication()).mobileClient = new MobileClient((ThisApplication) getApplication());
+        ThisApplication.currentUserProfile = new CurrentUserProfile(getApplication());
         ((ThisApplication) getApplication()).setCryptoKey();
 
         SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData",Context.MODE_PRIVATE);
@@ -48,18 +51,13 @@ public class SplashActivity extends AppCompatActivity {
         else{
             if(unameChef!=null){
                 ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
-                new Thread(()->{
-                    ((ThisApplication)getApplication()).mobileClient.connect(unameChef,pwdChef,true);
-                }).start();
+                ((ThisApplication)getApplication()).mobileClient.connect(unameChef,pwdChef,true);
             }
             else if(unameUser!=null){
                 ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
-                new Thread(()->{
-                    ((ThisApplication)getApplication()).mobileClient.connectAsCusto(unameUser,pwdUser,true);
-                }).start();
+                ((ThisApplication)getApplication()).mobileClient.connectAsCusto(unameUser,pwdUser,true);
             }
         }
-
     }
 
     // Permissions

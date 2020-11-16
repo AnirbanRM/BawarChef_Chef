@@ -36,6 +36,7 @@ public abstract class AuthenticationManager {
             }
         }
 
+
         private void step1(Message m) {
             Message t = new Message(Message.Direction.CLIENT_TO_SERVER,"AUTH->RESPONSE");
             t.putProperty("IDENTITY",ThisApplication.currentUserProfile.getCrypto_Key());
@@ -50,6 +51,7 @@ public abstract class AuthenticationManager {
             }catch (Exception e){Log.e("SERIALIZATION ERROR",e.getMessage());}
             currentClient.setCrypto_key(arrayxor(currentClient.getCrypto_key(),ThisApplication.currentUserProfile.getCrypto_Key()));
         }
+
 
         private void step2(Message m) {
             restore();

@@ -176,12 +176,21 @@ public class DashboardUserActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ((ThisApplication)getApplication()).setMessageProcessor(defaultMessageProcessor);
+        ((ThisApplication)getApplication()).setCurrentContext(null);
     }
 
     @Override
     public void onBackPressed() {
         if(getSupportFragmentManager().getBackStackEntryCount()==0) {
             super.onBackPressed();
+            try{
+                if(getApplication() instanceof ThisApplication) {
+                    ((ThisApplication) getApplication()).mobileClient.closeConnection();
+                    ((ThisApplication) getApplication()).mobileClient.setDefaultCryptoKey();
+                    ((ThisApplication) getApplication()).setCryptoKey();
+                }
+
+            }catch (Exception e){}
         }
         else{
             getSupportFragmentManager().popBackStack();

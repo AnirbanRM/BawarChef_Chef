@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
@@ -100,7 +101,6 @@ public class DashboardActivity extends AppCompatActivity {
         super.onResume();
         defaultMessageProcessor = ((ThisApplication)getApplication()).getMessageProcessor();
         ((ThisApplication)getApplication()).setMessageProcessor(activityMessageProcessor);
-        ((ThisApplication)getApplication()).setCurrentContext(this);
         new Thread(() -> ((ThisApplication)getApplication()).startLocationUpdates(onLocationChange)).start();
         new Thread(() -> ((ThisApplication)getApplication()).startLocationSharing()).start();
     }
@@ -109,14 +109,7 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ((ThisApplication)getApplication()).setMessageProcessor(defaultMessageProcessor);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        try {
-            ((ThisApplication) getApplication()).mobileClient.closeConnection();
-        }catch (Exception e){}
+        ((ThisApplication)getApplication()).setCurrentContext(null);
     }
 
     public static Fragment activeFragment = null;
@@ -177,7 +170,6 @@ public class DashboardActivity extends AppCompatActivity {
                     .beginTransaction()
                     .replace(R.id.fragmentViewPort, activeFragment)
                     .commit();
-
         }
     }
 
@@ -185,6 +177,14 @@ public class DashboardActivity extends AppCompatActivity {
     public void onBackPressed() {
         if(getSupportFragmentManager().getBackStackEntryCount()==0) {
             super.onBackPressed();
+            try{
+                if(getApplication() instanceof ThisApplication) {
+                    ((ThisApplication) getApplication()).mobileClient.closeConnection();
+                    ((ThisApplication) getApplication()).mobileClient.setDefaultCryptoKey();
+                    ((ThisApplication) getApplication()).setCryptoKey();
+                }
+
+            }catch (Exception e){}
         }
         else{
             getSupportFragmentManager().popBackStack();
@@ -229,8 +229,6 @@ public class DashboardActivity extends AppCompatActivity {
             else{
                 ((MessageReceiver)activeFragment).process(m);
             }
-
-
         }
     };
 

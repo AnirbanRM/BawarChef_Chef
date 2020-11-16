@@ -43,7 +43,7 @@ public class ScaleIngredient extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_scale,container);
+        v = inflater.inflate(R.layout.fragment_scale,container,false);
         return v;
     }
 

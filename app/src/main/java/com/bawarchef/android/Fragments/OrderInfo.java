@@ -345,12 +345,14 @@ public class OrderInfo extends Fragment implements OnMapReadyCallback, MessageRe
         String timepart[] = osi.datetime.split(" ")[1].split(":");
 
         Calendar calendar = Calendar.getInstance();
-        calendar.set(Integer.parseInt(datepart[0]),Integer.parseInt(datepart[1]),Integer.parseInt(datepart[2]),Integer.parseInt(timepart[0]),Integer.parseInt(timepart[1]));
+        calendar.set(Integer.parseInt(datepart[0]),Integer.parseInt(datepart[1])-1,Integer.parseInt(datepart[2]),Integer.parseInt(timepart[0]),Integer.parseInt(timepart[1]));
 
         Date bookDt = calendar.getTime();
+        Log.e("1",bookDt.toString());
         Date nowDt = Calendar.getInstance().getTime();
+        Log.e("2",nowDt.toString());
 
-        if(bookDt.getTime()-nowDt.getTime()<30*60)
+        if(bookDt.getTime()-nowDt.getTime()>30*60*1000)
             disableTracking();
 
         new Thread(() -> {

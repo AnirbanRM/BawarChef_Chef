@@ -14,6 +14,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.bawarchef.Communication.EncryptedPayload;
@@ -133,94 +134,32 @@ public class ThisApplication extends Application {
         }
     }
 
-    public void reEstablish(){
+    public void reEstablish(@Nullable EncryptedPayload encryptedPayload){
         Log.e("REESTABLISH","RETRYING");
-        mobileClient = new MobileClient(this);
+        mobileClient.setDefaultCryptoKey();
 
-        setCryptoKey();
-        SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData",Context.MODE_PRIVATE);
-        SharedPreferences sharedPref2 = getSharedPreferences("BawarChef_USER_AppData",Context.MODE_PRIVATE);
-
-        String unameChef = sharedPref1.getString("UNAME", null);
-        String pwdChef = sharedPref1.getString("PWD", null);
-        String unameUser = sharedPref2.getString("UNAME", null);
-        String pwdUser = sharedPref2.getString("PWD", null);
-
-        if(unameChef!=null){
-            ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.CHEF);
-            ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
-            ThisApplication.currentUserProfile.setChefUName(unameChef);
-
-            ThisApplication.currentUserProfile.setPassword(pwdChef);
-
-            final String pwd2 = pwdChef;
-            new Thread(()->{
-                try {
-                    mobileClient.initialSocketSetup();
-                } catch (IOException e) {
-                    Log.e("SOCKET","NOT ESTAB");
-                    try {
-                        Thread.sleep(4000);
-                    }catch (Exception e2){}
-                    reEstablish();
-                    return;
-                }
-
-                AuthenticationManager authenticationManager = new AuthenticationManager(mobileClient) {
-                    @Override
-                    public void onSuccessResponse(Message m) {
-                        ThisApplication.currentUserProfile.setChefIdentity((ChefIdentity) m.getProperty("CHEF_IDENTITY"));
-                        setMessageProcessor(((DashboardActivity)currentContext).activityMessageProcessor);
-                    }
-
-                    @Override
-                    public void onFailureResponse(Message m) { }
-                };
-
-                authenticationManager.waitAndWork();
-                new Thread(()->mobileClient.startListening()).start();
-            }).start();
-        }
-        else if(unameUser!=null){
-            mobileClient.setDefaultCryptoKey();
-            ThisApplication.currentUserProfile.setClientType(CurrentUserProfile.ClientType.USER);
-            ThisApplication.currentUserProfile.setType(CurrentUserProfile.Type.REGISTERED);
-            ThisApplication.currentUserProfile.setUserUName(unameUser);
-
-            ThisApplication.currentUserProfile.setPassword(pwdUser);
-
-            final String pwd2 = pwdUser;
-            new Thread(()->{
-                try {
-                    mobileClient.initialSocketSetup();
-                } catch (IOException e) {
-                    Log.e("SOCKET","NOT ESTAB");
-                    try {
-                        Thread.sleep(4000);
-                    }catch (Exception e2){}
-                    reEstablish();
-                    return;
-                }
-
-                AuthenticationManager authenticationManager = new AuthenticationManager(mobileClient) {
-                    @Override
-                    public void onSuccessResponse(Message m) {
-                        ThisApplication.currentUserProfile.setUserIdentity((UserIdentity) m.getProperty("USER_IDENTITY"));
-                        setMessageProcessor(((DashboardUserActivity)currentContext).activityMessageProcessor);
-                    }
-
-                    @Override
-                    public void onFailureResponse(Message m) { }
-                };
-
-                authenticationManager.waitAndWork();
-                mobileClient.startListening();
-            }).start();
-
+        try {
+            mobileClient.initialSocketSetup();
+        } catch (IOException e) {
+            return;
         }
 
+        AuthenticationManager authenticationManager = new AuthenticationManager(mobileClient) {
+            @Override
+            public void onSuccessResponse(Message m) {
+                if(currentContext instanceof DashboardUserActivity) {
+                    setMessageProcessor(((DashboardUserActivity) currentContext).activityMessageProcessor);
+                }
+                if(currentContext instanceof DashboardActivity) {
+                    setMessageProcessor(((DashboardActivity) currentContext).activityMessageProcessor);
+                }
+            }
 
+            @Override
+            public void onFailureResponse(Message m) { }
+        };
 
-
+        authenticationManager.waitAndWork();
+        new Thread(()->mobileClient.startListening()).start();
     }
 }

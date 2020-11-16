@@ -15,12 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -73,6 +75,7 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
     TextView name,rating;
     View map_ind_v;
     FrameLayout map,list;
+    ImageButton broadcast;
 
     RecyclerViewChefAdapter recyclerViewChefAdapter;
 
@@ -83,6 +86,8 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
 
         map = v.findViewById(R.id.map_view);
         list = v.findViewById(R.id.list_view);
+        broadcast = v.findViewById(R.id.bcast);
+        broadcast.setOnClickListener(bcastclicked);
 
         chefs = new ArrayList<ChefAdvertMinorContainer>();
 
@@ -119,6 +124,13 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
         getData();
         list.setVisibility(View.VISIBLE);
     }
+
+    BroadcastUserPage bp;
+    View.OnClickListener bcastclicked = v -> {
+        FragmentManager fm = getActivity().getSupportFragmentManager();
+        bp = new BroadcastUserPage();
+        bp.show(fm, null);
+    };
 
     View.OnClickListener map_ind_v_clicked = new View.OnClickListener() {
         @Override
@@ -303,6 +315,8 @@ public class UHome extends Fragment implements MessageReceiver, OnMapReadyCallba
     @Override
     public void onPause() {
         mapView.onPause();
+        if(bp!=null)
+            bp.dismiss();
         super.onPause();
     }
     @Override
