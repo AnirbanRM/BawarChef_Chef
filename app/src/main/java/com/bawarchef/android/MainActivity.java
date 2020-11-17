@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
         chefT = findViewById(R.id.chefText);
         custoT = findViewById(R.id.custoText);
 
+
+
         chefI.setOnClickListener(v -> selectType(CurrentUserProfile.ClientType.CHEF));
         custoI.setOnClickListener(v -> selectType(CurrentUserProfile.ClientType.USER));
     }

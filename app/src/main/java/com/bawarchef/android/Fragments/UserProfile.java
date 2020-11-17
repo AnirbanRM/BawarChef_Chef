@@ -102,6 +102,8 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
             mapViewBundle = savedInstanceState.getBundle(MAP_VIEW_BUNDLE_KEY);
         }
 
+        setInfo();
+
         profile_upd_button.setOnClickListener(updateProfile);
 
         mapView.onCreate(mapViewBundle);
@@ -111,8 +113,6 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
         maleB.setOnClickListener(genderchange);
         femaleB.setOnClickListener(genderchange);
         dobbox.setOnClickListener(calendar);
-
-        setInfo();
     }
 
     View.OnClickListener updateProfile = new View.OnClickListener() {
@@ -200,6 +200,7 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
         resCity.setText(ui.addr.city);
         resState.setText(ui.addr.state);
         resPincode.setText(ui.addr.pinNo);
+        currentLocation = new LatLng(ui.lati,ui.longi);
         mob.setText(ui.mob);
         email.setText(ui.email);
         if(ui.dp!=null && ui.dp.length!=0) {
@@ -339,8 +340,8 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
         if(latLng!=null) {
             if(currentLocation==null)
                 currentLocation = latLng;
-            gMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            currentMarker = gMap.addMarker(new MarkerOptions().flat(false).position(latLng).draggable(false));
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
+            currentMarker = gMap.addMarker(new MarkerOptions().flat(false).position(currentLocation).draggable(false));
         }
         gMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
