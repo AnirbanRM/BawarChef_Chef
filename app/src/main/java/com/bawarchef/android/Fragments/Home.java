@@ -69,8 +69,14 @@ public class Home extends Fragment implements MessageReceiver{
                 rank.setText(String.valueOf(m.getProperty("RANK")));
                 score.setText(String.format("%.2f",m.getProperty("SCORE")));
 
-                kingname.setText((String)m.getProperty("COTMName"));
-                kingscore.setText(String.format("%.2f",m.getProperty("COTMScore")));
+                if(m.getProperty("COTMName")==null){
+                    kingname.setText("NOT YET DECLARED");
+                    kingscore.setText("N.A.");
+                    kingdp.setVisibility(View.INVISIBLE);
+                }else {
+                    kingname.setText((String) m.getProperty("COTMName"));
+                    kingscore.setText(String.format("%.2f", m.getProperty("COTMScore")));
+                }
 
                 byte[] kingdpbyte = (byte[])m.getProperty("COTMDP");
 

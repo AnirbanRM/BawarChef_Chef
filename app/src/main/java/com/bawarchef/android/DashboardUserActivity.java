@@ -176,7 +176,6 @@ public class DashboardUserActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ((ThisApplication)getApplication()).setMessageProcessor(defaultMessageProcessor);
-        ((ThisApplication)getApplication()).setCurrentContext(null);
     }
 
     @Override

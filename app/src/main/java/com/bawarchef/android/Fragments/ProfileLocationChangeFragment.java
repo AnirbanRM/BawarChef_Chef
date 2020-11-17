@@ -74,6 +74,7 @@ public class ProfileLocationChangeFragment extends Fragment implements OnMapRead
         @Override
         public void onClick(View v) {
             profile.currentLocation = changableLocation;
+            profile.refreshLocation();
             Intent intent = new Intent(getContext(), ProfileLocationChangeFragment.class);
             getTargetFragment().onActivityResult(getTargetRequestCode(), RESULT_OK, intent);
             getFragmentManager().popBackStack();

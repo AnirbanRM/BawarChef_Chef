@@ -32,6 +32,7 @@ public class LocationEngine {
     LocationEngine(ThisApplication application,OnLocationChange onLocationChange) {
         this.onLocationChange = onLocationChange;
         this.appRfs = application;
+        if(appRfs.currentContext==null)return;
         locationProviderClient = LocationServices.getFusedLocationProviderClient(appRfs.currentContext);
         fetchLastLocation();
 

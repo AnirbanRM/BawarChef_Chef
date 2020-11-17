@@ -145,8 +145,9 @@ public class FoodMenu extends Fragment implements MessageReceiver{
                         dialog.hide();
                         dialog=null;
                     }
-                    Log.e("LOL",m.getProperty("MENU_TREE").toString());
                     FoodMenu.this.t = (Tree) m.getProperty("MENU_TREE");
+                    if(FoodMenu.this.t==null)
+                        FoodMenu.this.t=new Tree("MENU");
                     root = t.getRoot();
                     items = root.getChildren();
                     list.removeAllViews();

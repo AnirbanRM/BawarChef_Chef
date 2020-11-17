@@ -13,7 +13,8 @@ public class ChefIdentity implements Serializable {
 
     public ChefIdentity(){}
 
-    public String regNo,fname,lname,mob,email,altmob,emermob,dob,aadhar;
+    public String regNo,fname,lname,mob,email,altmob,emermob,dob,aadhar,bio;
+    public double lati,longi;
     public byte[] dp;
     public Address resAddr = new Address(),mailAddr = new Address();
     public char gender = 'M';

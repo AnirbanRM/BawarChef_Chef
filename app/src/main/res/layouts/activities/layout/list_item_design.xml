@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:background="@drawable/tree_node_textbox"
         android:hint="Untitiled"
+        android:singleLine="true"
         android:fontFamily="@font/raleway_regular"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

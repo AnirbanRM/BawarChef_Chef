@@ -98,7 +98,7 @@ public class ChefLoginDetails extends AppCompatActivity {
                         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         ((ThisApplication)getApplication()).getCurrentContext().startActivity(i);
                     });
-                if(m.getProperty("RESULT").equals("FAILURE"))
+                else if(m.getProperty("RESULT").equals("FAILURE"))
                     runOnUiThread(()->Toast.makeText(((ThisApplication)getApplication()).getCurrentContext(),"Invalid entry !",Toast.LENGTH_SHORT).show());
             }
         }

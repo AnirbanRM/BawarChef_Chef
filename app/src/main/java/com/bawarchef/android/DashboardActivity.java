@@ -81,6 +81,12 @@ public class DashboardActivity extends AppCompatActivity {
             setFragment(item);
             return true;
         });
+
+        SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData", Context.MODE_PRIVATE);
+        String cname = sharedPref1.getString("DEF_CIRCLE_NAME",null);
+        if(cname!=null) {
+            area_circ.setText(cname);
+        }
     }
 
     private void setLocationCircle(LatLng location) {
@@ -109,7 +115,6 @@ public class DashboardActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         ((ThisApplication)getApplication()).setMessageProcessor(defaultMessageProcessor);
-        ((ThisApplication)getApplication()).setCurrentContext(null);
     }
 
     public static Fragment activeFragment = null;
@@ -208,7 +213,7 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                 }
                 area_circ.setText(nearest.getPlaceTitle());
-                checkforCircleChange(nearest,(String)m.getProperty("REG_CIRCLE"));
+                checkforCircleChange(nearest,(String)m.getProperty("REG_CIRCLE"),(String)m.getProperty("REG_CIRCLE_NAME"));
             }
 
             else if (m.getMsg_type().equals("GEOLOC_REG_RESP")){
@@ -221,6 +226,7 @@ public class DashboardActivity extends AppCompatActivity {
                     }
                     editor.apply();
                     runOnUiThread(()->{
+                        area_circ.setText((String) m.getProperty("CIRCLE_NAME"));
                         Toast.makeText(DashboardActivity.this,"Successfully updated circle !",Toast.LENGTH_SHORT).show();
                     });
                 }
@@ -232,17 +238,15 @@ public class DashboardActivity extends AppCompatActivity {
         }
     };
 
-    private void checkforCircleChange(GeoLocationCircle nearest, String regCircle) {
+
+    private void checkforCircleChange(GeoLocationCircle nearest, String regCircle,String name) {
         SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData", Context.MODE_PRIVATE);
         String circleID = sharedPref1.getString("DEF_CIRCLE_ID", null);
-        if(!regCircle.equals(circleID)){
-            SharedPreferences.Editor editor = sharedPref1.edit();
-            editor.putString("DEF_CIRCLE_ID",regCircle);
-            editor.apply();
-            circleID = regCircle;
-        }
 
-        if(circleID==null){
+        Log.e("1",circleID);Log.e("2",regCircle);
+
+        if(regCircle==null){
+            Log.e("LOL","1");
             Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"CIRCLE_REGISTRATION");
             m.putProperty("CIRCLE_ID",String.valueOf(nearest.getId()));
             try {
@@ -250,15 +254,24 @@ public class DashboardActivity extends AppCompatActivity {
                 AsyncSender asyncSender = new AsyncSender();
                 asyncSender.execute(ep);
             }catch(Exception e){}
+            return;
         }
 
-        else if(!circleID.equals(String.valueOf(nearest.getId()))&&changeCircle) {
+        if(circleID==null){
+            Log.e("LOL","2");
+            SharedPreferences.Editor editor = sharedPref1.edit();
+            editor.putString("DEF_CIRCLE_ID",regCircle);
+            editor.putString("DEF_CIRCLE_NAME",name);
+            editor.apply();
+            return;
+        }
+
+        if(!regCircle.equals(String.valueOf(nearest.getId()))&&changeCircle) {
+            Log.e("LOL","3");
             Intent i = new Intent(DashboardActivity.this,CircleChange.class);
             i.putExtra("newC",nearest.getPlaceTitle());
             i.putExtra("newI",String.valueOf(nearest.getId()));
             startActivity(i);
-
-
         }
     }
 

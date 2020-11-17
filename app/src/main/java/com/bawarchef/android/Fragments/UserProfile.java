@@ -43,6 +43,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.yalantis.ucrop.UCrop;
 
@@ -328,6 +329,7 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
         mapView.onLowMemory();
     }
 
+    Marker currentMarker;
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.gMap = googleMap;
@@ -338,9 +340,16 @@ public class UserProfile extends Fragment implements OnMapReadyCallback,MessageR
             if(currentLocation==null)
                 currentLocation = latLng;
             gMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            MarkerOptions options = new MarkerOptions().flat(false).position(latLng).draggable(false);
-            gMap.addMarker(options);
+            currentMarker = gMap.addMarker(new MarkerOptions().flat(false).position(latLng).draggable(false));
         }
+        gMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                currentLocation = latLng;
+                currentMarker.remove();
+                currentMarker = gMap.addMarker(new MarkerOptions().flat(false).position(latLng).draggable(false));
+            }
+        });
     }
 //------------------------------------------------------------------------------------------------------------------
 

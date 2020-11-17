@@ -126,10 +126,17 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
 
         uname.setText(ThisApplication.currentUserProfile.getChefUName());
         name.setText(ThisApplication.currentUserProfile.getChefIdentity().fname + " " + ThisApplication.currentUserProfile.getChefIdentity().lname);
+        bio.setText(ThisApplication.currentUserProfile.getChefIdentity().bio);
 
-        if(ThisApplication.currentUserProfile.getChefIdentity().dp!=null){
-            dp_box.setImageBitmap(BitmapFactory.decodeByteArray(ThisApplication.currentUserProfile.getChefIdentity().dp,0,ThisApplication.currentUserProfile.getChefIdentity().dp.length));
+        if(ThisApplication.currentUserProfile.getChefIdentity().dp!=null) {
+            byte[] dparr = ThisApplication.currentUserProfile.getChefIdentity().dp;
+            dp = BitmapFactory.decodeByteArray(dparr, 0, dparr.length);
+            dp_box.setImageBitmap(dp);
         }
+
+        if(ThisApplication.currentUserProfile.getChefIdentity().lati!=0 && ThisApplication.currentUserProfile.getChefIdentity().longi!=0)
+            currentLocation = new LatLng(ThisApplication.currentUserProfile.getChefIdentity().lati,ThisApplication.currentUserProfile.getChefIdentity().longi);
+
 
         specialityItems = new ArrayList<SpecialityItem>();
         specialityItems.add(SpecialityItem.getAdder("Add new highlight"));
@@ -147,12 +154,6 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
         SpecialityRecyclerAdapter specialityRecyclerAdapter = new SpecialityRecyclerAdapter();
         speciality_listV.setAdapter(specialityRecyclerAdapter);
 
-        Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"PROFILE_FETCH");
-        try {
-            EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m),((ThisApplication)getActivity().getApplication()).mobileClient.getCrypto_key());
-            FetchProfileAsyncTask fetchProfileAsyncTask = new FetchProfileAsyncTask();
-            fetchProfileAsyncTask.execute(ep);
-        }catch (Exception e){}
     }
 
     View.OnClickListener upd_profile = v -> {
@@ -167,6 +168,8 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
         chefProfileContainer.resiLng = (float) currentLocation.longitude;
         chefProfileContainer.uName = uname.getText().toString();
 
+        chefProfileContainer.dp = bytearray(dp);
+
         Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"UPD_PROFILE_CHEF");
         m.putProperty("DATA", chefProfileContainer);
 
@@ -176,6 +179,12 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
             updateProfileAsyncTask.execute(ep);
         }catch (Exception e){}
     };
+
+    private byte[] bytearray(Bitmap dp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        dp.compress(Bitmap.CompressFormat.PNG,100,baos);
+        return baos.toByteArray();
+    }
 
     View.OnClickListener changeLocation = v -> {
 
@@ -390,26 +399,12 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
                 }
                 Toast.makeText(getActivity(),"Updated Succcessfully",Toast.LENGTH_SHORT).show();
                 ThisApplication.currentUserProfile.setChefUName(uname.getText().toString());
+                ThisApplication.currentUserProfile.getChefIdentity().bio = bio.getText().toString();
+                ThisApplication.currentUserProfile.getChefIdentity().lati = currentLocation.latitude;
+                ThisApplication.currentUserProfile.getChefIdentity().longi = currentLocation.longitude;
+                ThisApplication.currentUserProfile.getChefIdentity().dp = bytearray(dp);
             });
         }
-        else if(m.getMsg_type().equals("PROFILE_FETCH_RESP")){
-            ChefProfileContainer chefProfileContainer = (ChefProfileContainer) m.getProperty("DATA");
-            getActivity().runOnUiThread(()->{
-                if(chefProfileContainer.bio!=null)
-                    bio.setText(chefProfileContainer.bio);
-                if(chefProfileContainer.resiLng!=0&& chefProfileContainer.resiLat!=0) {
-                    currentLocation = new LatLng(chefProfileContainer.resiLat, chefProfileContainer.resiLng);
-                    refreshLocation();
-                }
-                if(chefProfileContainer.dp!=null && chefProfileContainer.dp.length!=0) {
-                    dp = BitmapFactory.decodeByteArray(chefProfileContainer.dp, 0, chefProfileContainer.dp.length);
-                    dp_box.setImageBitmap(dp);
-                }
-                if(dialog!=null&& dialog.isShowing())
-                    dialog.dismiss();
-            });
-        }
-
     }
 
 //------------------------------------------MAP------------------------------------------------
@@ -473,7 +468,7 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
                 currentLocation = latLng;
             mapZoom.setProgress((int)(100*((float)18/20)));
             gMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            MarkerOptions options = new MarkerOptions().flat(false).position(latLng).draggable(false);
+            MarkerOptions options = new MarkerOptions().flat(false).position(currentLocation).draggable(false);
             gMap.addMarker(options);
         }
     }
