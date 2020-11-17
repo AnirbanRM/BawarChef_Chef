@@ -166,7 +166,6 @@ public class DashboardUserActivity extends AppCompatActivity {
         activeFragment = new Cart();
 
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        activeFragment.setTargetFragment(getSupportFragmentManager().getFragments().get(getSupportFragmentManager().getBackStackEntryCount()), 9999);
         ft.add(R.id.fragmentViewPort,activeFragment);
         ft.addToBackStack(null);
         ft.commit();;
