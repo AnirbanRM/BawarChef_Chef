@@ -467,7 +467,7 @@ public class MyProfile extends Fragment implements OnMapReadyCallback,MessageRec
             if(currentLocation==null)
                 currentLocation = latLng;
             mapZoom.setProgress((int)(100*((float)18/20)));
-            gMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            gMap.moveCamera(CameraUpdateFactory.newLatLng(currentLocation));
             MarkerOptions options = new MarkerOptions().flat(false).position(currentLocation).draggable(false);
             gMap.addMarker(options);
         }
