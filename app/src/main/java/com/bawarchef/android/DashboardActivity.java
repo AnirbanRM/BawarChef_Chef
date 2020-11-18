@@ -86,6 +86,7 @@ public class DashboardActivity extends AppCompatActivity {
         if(cname!=null) {
             area_circ.setText(cname);
         }
+        new Thread(() -> ((ThisApplication)getApplication()).startLocationUpdates(onLocationChange)).start();
     }
 
     private void setLocationCircle(LatLng location) {
@@ -106,7 +107,6 @@ public class DashboardActivity extends AppCompatActivity {
         super.onResume();
         defaultMessageProcessor = ((ThisApplication)getApplication()).getMessageProcessor();
         ((ThisApplication)getApplication()).setMessageProcessor(activityMessageProcessor);
-        new Thread(() -> ((ThisApplication)getApplication()).startLocationUpdates(onLocationChange)).start();
     }
 
     @Override
