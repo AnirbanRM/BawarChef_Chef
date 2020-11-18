@@ -74,7 +74,6 @@ public class DashboardActivity extends AppCompatActivity {
 
         menu_but.setOnClickListener(v -> drawer.openDrawer(GravityCompat.START,true));
 
-        setFragment(navView.getMenu().getItem(0));
         navView.setNavigationItemSelectedListener(item -> {
             item.setChecked(true);
             drawer.closeDrawer(GravityCompat.START,true);
@@ -108,7 +107,6 @@ public class DashboardActivity extends AppCompatActivity {
         defaultMessageProcessor = ((ThisApplication)getApplication()).getMessageProcessor();
         ((ThisApplication)getApplication()).setMessageProcessor(activityMessageProcessor);
         new Thread(() -> ((ThisApplication)getApplication()).startLocationUpdates(onLocationChange)).start();
-        new Thread(() -> ((ThisApplication)getApplication()).startLocationSharing()).start();
     }
 
     @Override
@@ -212,8 +210,9 @@ public class DashboardActivity extends AppCompatActivity {
                         nearest = loc;
                     }
                 }
-                area_circ.setText(nearest.getPlaceTitle());
                 checkforCircleChange(nearest,(String)m.getProperty("REG_CIRCLE"),(String)m.getProperty("REG_CIRCLE_NAME"));
+                new Thread(()-> ((ThisApplication)getApplication()).startLocationSharing());
+                runOnUiThread(()->setFragment(navView.getMenu().getItem(0)));
             }
 
             else if (m.getMsg_type().equals("GEOLOC_REG_RESP")){
@@ -243,7 +242,6 @@ public class DashboardActivity extends AppCompatActivity {
         SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData", Context.MODE_PRIVATE);
         String circleID = sharedPref1.getString("DEF_CIRCLE_ID", null);
 
-        Log.e("1",circleID);Log.e("2",regCircle);
 
         if(regCircle==null){
             Log.e("LOL","1");
@@ -263,6 +261,7 @@ public class DashboardActivity extends AppCompatActivity {
             editor.putString("DEF_CIRCLE_ID",regCircle);
             editor.putString("DEF_CIRCLE_NAME",name);
             editor.apply();
+            area_circ.setText(name);
             return;
         }
 

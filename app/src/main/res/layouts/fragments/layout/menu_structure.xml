@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:text="My Category"
+        android:text="Select a menu to edit..."
         android:fontFamily="@font/raleway_bold"
         android:textColor="@color/button_color"
         android:paddingStart="30dp"

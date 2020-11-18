@@ -57,7 +57,8 @@
         android:id="@+id/kingimg"
         android:layout_width="100dp"
         android:layout_height="0dp"
-        android:layout_margin="30dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="30dp"
         android:background="@drawable/textbox_design"
         android:src="@drawable/person_black"
         app:layout_constraintTop_toTopOf="parent"
@@ -92,10 +93,11 @@
         android:padding="10dp"
         android:id="@+id/statsbody"
         android:layout_width="0dp"
-        android:layout_height="200dp"
+        android:layout_height="400dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/currObody"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="10dp"
@@ -139,7 +141,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:gravity="center"
-                        android:textSize="24sp"
+                        android:textSize="30sp"
                         android:textColor="@color/button_color"
                         android:text="0"
                         android:fontFamily="@font/raleway_bold"
@@ -184,7 +186,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:gravity="center"
-                        android:textSize="24sp"
+                        android:textSize="30sp"
                         android:textColor="@color/button_color"
                         android:text="0"
                         android:fontFamily="@font/raleway_bold"
@@ -238,7 +240,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:gravity="center"
-                        android:textSize="30sp"
+                        android:textSize="50sp"
                         android:textColor="@color/button_color"
                         android:text="0"
                         android:fontFamily="@font/raleway_bold" />
@@ -291,7 +293,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:gravity="center"
-                        android:textSize="24sp"
+                        android:textSize="30sp"
                         android:textColor="@color/button_color"
                         android:text="0"
                         android:fontFamily="@font/raleway_bold"
@@ -336,7 +338,7 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintBottom_toBottomOf="parent"
                         android:gravity="center"
-                        android:textSize="24sp"
+                        android:textSize="30sp"
                         android:textColor="@color/button_color"
                         android:text="0"
                         android:fontFamily="@font/raleway_bold"
@@ -350,99 +352,5 @@
 
     </LinearLayout>
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/pendObody"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/statsbody"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:background="@drawable/textbox_design">
-
-        <TextView
-            android:id="@+id/pendText"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:padding="10dp"
-            android:gravity="center"
-            android:background="@drawable/textbox_design"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:textColor="@color/button_color"
-            android:textSize="18sp"
-            android:fontFamily="@font/raleway_bold"
-            android:text="Pending Orders"/>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/pend_bot"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="+0 more"
-                android:padding="5dp"
-                android:gravity="end"
-                android:layout_marginStart="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@color/button_color"
-                android:fontFamily="@font/raleway_regular"
-                />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="See more"
-                android:padding="5dp"
-                android:gravity="end"
-                android:layout_marginEnd="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_marginTop="10dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:textColor="@color/button_color"
-                android:fontFamily="@font/raleway_regular"
-                />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <ListView
-            android:id="@+id/pendList"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintTop_toBottomOf="@id/pendText"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/pend_bot"
-            app:layout_constraintEnd_toEndOf="parent" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:gravity="center"
-            android:text="No pending orders"
-            app:layout_constraintStart_toStartOf="@id/pendList"
-            app:layout_constraintEnd_toEndOf="@id/pendList"
-            app:layout_constraintTop_toTopOf="@id/pendList"
-            app:layout_constraintBottom_toBottomOf="@id/pendList"
-            android:textSize="18sp"
-            android:fontFamily="@font/raleway_light"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

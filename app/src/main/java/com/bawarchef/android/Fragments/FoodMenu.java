@@ -2,6 +2,8 @@ package com.bawarchef.android.Fragments;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
@@ -13,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -47,14 +50,17 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         return v;
     }
 
-    Tree t = new Tree("Menu");
-    Node root;
+    ArrayList<Tree> menus;
+
+    Tree currentTree;
+
     RecyclerView list;
     Button addButton;
     EditText head_name;
-    ImageButton upload;
+    ImageButton upload, addMenu,deleteMenu;
 
-    ArrayList<Node> items;
+    RecyclerView menulist;
+    MenuRecyclerAdapter menuAdapter;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -62,9 +68,20 @@ public class FoodMenu extends Fragment implements MessageReceiver{
 
         list = v.findViewById(R.id.list);
         addButton = v.findViewById(R.id.add_button);
+        menulist = v.findViewById(R.id.menuname);
 
-        root = t.getRoot();
-        items = root.getChildren();
+        addMenu = v.findViewById(R.id.addmenu);
+        addMenu.setOnClickListener(addMenuclicked);
+        deleteMenu = v.findViewById(R.id.deletemenu);
+        deleteMenu.setOnClickListener(deleteMenuclicked);
+
+        menus = new ArrayList<Tree>();
+
+        LinearLayoutManager recyMngr2 = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        menulist.setLayoutManager(recyMngr2);
+        menulist.setItemAnimator(new DefaultItemAnimator());
+        menuAdapter = new MenuRecyclerAdapter();
+        menulist.setAdapter(menuAdapter);
 
         upload = v.findViewById(R.id.upload_menu);
         upload.setOnClickListener(update_menu);
@@ -81,13 +98,39 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         addButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                items.add(new Node(root,"",true));
+                if(currentTree==null)return;
+                currentTree.getRoot().add(new Node(currentTree.getRoot(),"",true));
                 list.removeAllViews();
                 list.getAdapter().notifyDataSetChanged();
             }
         });
         fetch();
     }
+
+    View.OnClickListener addMenuclicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            menus.add(new Tree("Untitled Menu"));
+            menuAdapter.notifyDataSetChanged();
+        }
+    };
+
+    View.OnClickListener deleteMenuclicked = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(currentTree!=null){
+                menus.remove(currentTree);
+                currentTree = null;
+                menulist.removeAllViews();
+                menuAdapter.notifyDataSetChanged();
+                list.removeAllViews();
+                list.getAdapter().notifyDataSetChanged();
+                head_name.setEnabled(false);
+                head_name.setText("Select a menu to edit...");
+            }
+        }
+    };
+
 
     private void fetch(){
         Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "FETCH_CHEF_MENU");
@@ -102,7 +145,7 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         @Override
         public void onClick(View v) {
             Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "UPD_CHEF_MENU");
-            m.putProperty("MENU_DATA", FoodMenu.this.t);
+            m.putProperty("MENU_DATA", FoodMenu.this.currentTree);
             try {
                 EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
                 FoodMenu.UpdateMenuAsyncTask updateMenuAsyncTask = new FoodMenu.UpdateMenuAsyncTask();
@@ -145,13 +188,10 @@ public class FoodMenu extends Fragment implements MessageReceiver{
                         dialog.hide();
                         dialog=null;
                     }
-                    FoodMenu.this.t = (Tree) m.getProperty("MENU_TREE");
-                    if(FoodMenu.this.t==null)
-                        FoodMenu.this.t=new Tree("MENU");
-                    root = t.getRoot();
-                    items = root.getChildren();
-                    list.removeAllViews();
-                    list.getAdapter().notifyDataSetChanged();
+                    FoodMenu.this.menus = (ArrayList<Tree>) m.getProperty("MENU_TREE");
+                    if(FoodMenu.this.menus==null) {
+                        FoodMenu.this.menus = new ArrayList<Tree>();
+                    }
                 }
             });
         }
@@ -173,7 +213,7 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
             holder.setIsRecyclable(false);
             holder.text.setHint("Untitled Category");
-            holder.text.setText(items.get(position).getNodeText());
+            holder.text.setText(currentTree.getRoot().getChildren().get(position).getNodeText());
 
             holder.text.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -183,7 +223,7 @@ public class FoodMenu extends Fragment implements MessageReceiver{
 
                 @Override
                 public void afterTextChanged(Editable s) {
-                    items.get(position).setNodeText(holder.text.getText().toString());
+                    currentTree.getRoot().getChildren().get(position).setNodeText(holder.text.getText().toString());
                 }
             });
 
@@ -192,13 +232,13 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         }
 
         void delete(int position) {
-            items.remove(position);
+            currentTree.getRoot().getChildren().remove(position);
             list.removeAllViews();
             RecyclerViewFoodAdapter.this.notifyDataSetChanged();
         }
 
         void edit(int position){
-            Fragment fragment = new FoodMenu_2("Food",items.get(position),t);
+            Fragment fragment = new FoodMenu_2("Food",currentTree.getRoot().getChildren().get(position),currentTree);
 
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
             fragment.setTargetFragment(FoodMenu.this, 9999);
@@ -209,7 +249,8 @@ public class FoodMenu extends Fragment implements MessageReceiver{
 
         @Override
         public int getItemCount() {
-            return items.size();
+            if(currentTree==null)return 0;
+            return currentTree.getRoot().getChildren().size();
         }
 
         public class ViewHolder extends RecyclerView.ViewHolder{
@@ -266,6 +307,59 @@ public class FoodMenu extends Fragment implements MessageReceiver{
             ((ThisApplication)getActivity().getApplication()).mobileClient.send(encryptedPayloads[0]);
             return null;
         }
+    }
+
+    class MenuRecyclerAdapter extends RecyclerView.Adapter<MenuRecyclerAdapter.ViewHolder>{
+
+        ViewHolder activeElement;
+
+        @NonNull
+        @Override
+        public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater
+                    .from(parent.getContext())
+                    .inflate(R.layout.menuname_list_item_design,parent,false);
+            return new ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+            holder.menu_name.setText(menus.get(position).getRoot().getNodeText());
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(activeElement!=null) {
+                        activeElement.menu_name.setTypeface(Typeface.DEFAULT);
+                        activeElement.menu_name.setTextColor(Color.parseColor("#878787"));
+                    }
+
+                    holder.menu_name.setTypeface(Typeface.DEFAULT_BOLD);
+                    holder.menu_name.setTextColor(Color.BLACK);
+                    activeElement = holder;
+                    currentTree=menus.get(position);
+                    head_name.setText(menus.get(position).getRoot().getNodeText());
+                    head_name.setEnabled(true);
+                    list.removeAllViews();
+                    list.getAdapter().notifyDataSetChanged();
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            return menus.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder{
+            TextView menu_name;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                menu_name = itemView.findViewById(R.id.text);
+            }
+        }
+
     }
 
 }
