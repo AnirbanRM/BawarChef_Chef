@@ -23,6 +23,9 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bawarchef.Communication.EncryptedPayload;
 import com.bawarchef.Communication.Message;
@@ -62,12 +65,24 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
     ImageView dp;
     ConstraintLayout body;
 
+    ArrayList<Tree> menus;
+    RecyclerView menulist;
+    MenuRecyclerAdapter menuAdapter;
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         name_box = view.findViewById(R.id.name);
         dp = view.findViewById(R.id.dp);
         body = view.findViewById(R.id.body);
+
+        menulist = view.findViewById(R.id.menuname);
+
+        LinearLayoutManager recyMngr = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        menulist.setLayoutManager(recyMngr);
+        menulist.setItemAnimator(new DefaultItemAnimator());
+        menuAdapter = new MenuRecyclerAdapter();
+        menulist.setAdapter(menuAdapter);
 
         name_box.setText(name);
         dp.setImageBitmap(dp_img);
@@ -87,8 +102,9 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
     @Override
     public void process(Message m) {
         if(m.getMsg_type().equals("RESP_CHEF_MENU")){
+
             getActivity().runOnUiThread(() -> {
-                setMenuPreview((Tree)m.getProperty("CHEF_MENU"));
+                menus = ((ArrayList<Tree>)m.getProperty("CHEF_MENU"));
 
                 if(dialog!=null && dialog.isShowing()){
                     dialog.dismiss();
@@ -219,6 +235,55 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
             ((ThisApplication)getActivity().getApplication()).mobileClient.send(encryptedPayloads[0]);
             return null;
         }
+    }
+
+
+    class MenuRecyclerAdapter extends RecyclerView.Adapter<MenuRecyclerAdapter.ViewHolder>{
+
+        MenuRecyclerAdapter.ViewHolder activeElement;
+
+        @NonNull
+        @Override
+        public MenuRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            View v = LayoutInflater
+                    .from(parent.getContext())
+                    .inflate(R.layout.menuname_list_item_design,parent,false);
+            return new MenuRecyclerAdapter.ViewHolder(v);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MenuRecyclerAdapter.ViewHolder holder, int position) {
+
+            holder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if(activeElement!=null) {
+                        activeElement.menu_name.setTypeface(Typeface.DEFAULT);
+                        activeElement.menu_name.setTextColor(Color.parseColor("#878787"));
+                    }
+
+                    holder.menu_name.setTypeface(Typeface.DEFAULT_BOLD);
+                    holder.menu_name.setTextColor(Color.BLACK);
+                    activeElement = holder;
+                }
+            });
+        }
+
+        @Override
+        public int getItemCount() {
+            if(menus==null)return 0;
+            return menus.size();
+        }
+
+        public class ViewHolder extends RecyclerView.ViewHolder{
+            TextView menu_name;
+
+            public ViewHolder(@NonNull View itemView) {
+                super(itemView);
+                menu_name = itemView.findViewById(R.id.text);
+            }
+        }
+
     }
 
 

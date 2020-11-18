@@ -89,6 +89,8 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         head_name = v.findViewById(R.id.head_text);
         head_name.setEnabled(false);
 
+        head_name.addTextChangedListener(head_text_changed);
+
         LinearLayoutManager recyMngr = new LinearLayoutManager(
                 getActivity(), LinearLayoutManager.VERTICAL, false);
         list.setLayoutManager(recyMngr);
@@ -106,6 +108,21 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         });
         fetch();
     }
+
+    TextWatcher head_text_changed = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) { }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            if(currentTree==null)return;
+            currentTree.getRoot().setNodeText(head_name.getText().toString());
+            menuAdapter.setActiveElementText(head_name.getText().toString());
+        }
+    };
 
     View.OnClickListener addMenuclicked = new View.OnClickListener() {
         @Override
@@ -145,7 +162,7 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         @Override
         public void onClick(View v) {
             Message m = new Message(Message.Direction.CLIENT_TO_SERVER, "UPD_CHEF_MENU");
-            m.putProperty("MENU_DATA", FoodMenu.this.currentTree);
+            m.putProperty("MENU_DATA", FoodMenu.this.menus);
             try {
                 EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
                 FoodMenu.UpdateMenuAsyncTask updateMenuAsyncTask = new FoodMenu.UpdateMenuAsyncTask();
@@ -192,6 +209,8 @@ public class FoodMenu extends Fragment implements MessageReceiver{
                     if(FoodMenu.this.menus==null) {
                         FoodMenu.this.menus = new ArrayList<Tree>();
                     }
+                    menulist.removeAllViews();
+                    menuAdapter.notifyDataSetChanged();
                 }
             });
         }
@@ -312,6 +331,11 @@ public class FoodMenu extends Fragment implements MessageReceiver{
     class MenuRecyclerAdapter extends RecyclerView.Adapter<MenuRecyclerAdapter.ViewHolder>{
 
         ViewHolder activeElement;
+
+        public void setActiveElementText(String text){
+            if(activeElement!=null)
+                activeElement.menu_name.setText(text);
+        }
 
         @NonNull
         @Override
