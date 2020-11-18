@@ -242,9 +242,7 @@ public class DashboardActivity extends AppCompatActivity {
         SharedPreferences sharedPref1 = getSharedPreferences("BawarChef_CHEF_AppData", Context.MODE_PRIVATE);
         String circleID = sharedPref1.getString("DEF_CIRCLE_ID", null);
 
-
         if(regCircle==null){
-            Log.e("LOL","1");
             Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"CIRCLE_REGISTRATION");
             m.putProperty("CIRCLE_ID",String.valueOf(nearest.getId()));
             try {
@@ -252,7 +250,6 @@ public class DashboardActivity extends AppCompatActivity {
                 AsyncSender asyncSender = new AsyncSender();
                 asyncSender.execute(ep);
             }catch(Exception e){}
-            return;
         }
 
         if(circleID==null){
@@ -262,7 +259,6 @@ public class DashboardActivity extends AppCompatActivity {
             editor.putString("DEF_CIRCLE_NAME",name);
             editor.apply();
             area_circ.setText(name);
-            return;
         }
 
         if(!regCircle.equals(String.valueOf(nearest.getId()))&&changeCircle) {

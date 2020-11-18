@@ -147,9 +147,9 @@ public class FoodIngredientMenu extends FoodMenu_2 {
     View.OnClickListener ingAdded = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            ((FoodNode)currentNode).getIngredients().add(new Ingredient());
             ingList.removeAllViews();
             ingList.getAdapter().notifyDataSetChanged();
+            ((FoodNode)currentNode).getIngredients().add(new Ingredient());
         }
     };
 
@@ -167,6 +167,7 @@ public class FoodIngredientMenu extends FoodMenu_2 {
         @Override
         public void onBindViewHolder(@NonNull IngredientRecyclerViewAdapter.ViewHolder holder, int position) {
             Ingredient i = ((FoodNode)currentNode).getIngredients().get(position);
+            holder.setIsRecyclable(false);
             holder.ingredientName.setText(i.getTitle());
             holder.amount.setText(String.valueOf(i.getMagnitude()));
 
