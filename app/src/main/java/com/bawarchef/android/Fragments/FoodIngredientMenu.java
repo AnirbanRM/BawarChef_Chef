@@ -44,7 +44,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class FoodIngredientMenu extends FoodMenu_2 {
 
-    FoodIngredientMenu(String type, Node current_node, Tree t) {
+    FoodIngredientMenu(String type, Node current_node, ArrayList<Tree> t) {
         super(type, current_node,t);
     }
 

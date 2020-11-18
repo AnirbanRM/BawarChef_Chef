@@ -57,9 +57,9 @@ public class FoodMenu_2 extends Fragment {
     ImageButton upload;
 
     ArrayList<Node> items;
-    Tree t;
+    ArrayList<Tree> t;
 
-    FoodMenu_2(String type, Node current_node, Tree t){
+    FoodMenu_2(String type, Node current_node, ArrayList<Tree> t){
         this.type = type;
         this.head_name = current_node.getNodeText();
         this.currentNode =current_node;
