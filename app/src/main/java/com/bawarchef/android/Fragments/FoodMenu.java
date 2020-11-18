@@ -257,7 +257,7 @@ public class FoodMenu extends Fragment implements MessageReceiver{
         }
 
         void edit(int position){
-            Fragment fragment = new FoodMenu_2("Food",currentTree.getRoot().getChildren().get(position),currentTree);
+            Fragment fragment = new FoodMenu_2("Food",currentTree.getRoot().getChildren().get(position),menus);
 
             FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
             fragment.setTargetFragment(FoodMenu.this, 9999);
