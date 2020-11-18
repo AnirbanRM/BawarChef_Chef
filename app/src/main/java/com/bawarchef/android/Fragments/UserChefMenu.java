@@ -100,11 +100,13 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
     }
 
     @Override
+
     public void process(Message m) {
         if(m.getMsg_type().equals("RESP_CHEF_MENU")){
-
+            menus = ((ArrayList<Tree>)m.getProperty("CHEF_MENU"));
             getActivity().runOnUiThread(() -> {
-                menus = ((ArrayList<Tree>)m.getProperty("CHEF_MENU"));
+                menulist.removeAllViews();
+                menuAdapter.notifyDataSetChanged();
 
                 if(dialog!=null && dialog.isShowing()){
                     dialog.dismiss();
@@ -114,7 +116,14 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
         }
     }
 
+    ArrayList<Integer> assigned_views;
+
     private void setMenuPreview(Tree menuTree){
+        if(assigned_views!=null) {
+            for (Integer i : assigned_views)
+                body.removeView(v.findViewById(i));
+        }
+        assigned_views = new ArrayList<Integer>();
         ArrayList<Node> categories = menuTree.getRoot().getChildren();
         ArrayList<TextView> categoriesBox = new ArrayList<TextView>();
 
@@ -124,6 +133,7 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
         View lastNode=null;
         for(int i = 0; i<categoriesBox.size(); i++){
             body.addView(categoriesBox.get(i));
+            assigned_views.add(categoriesBox.get(i).getId());
             ConstraintSet cs = new ConstraintSet();
             cs.clone(body);
 
@@ -151,6 +161,7 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
         View lastNode=textView;
         for(int i = 0; i<foodsBox.size(); i++){
             body.addView(foodsBox.get(i));
+            assigned_views.add(foodsBox.get(i).getId());
             TextView b = getAddSubText();
             body.addView(b);
             ConstraintSet cs = new ConstraintSet();
@@ -254,6 +265,8 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
         @Override
         public void onBindViewHolder(@NonNull MenuRecyclerAdapter.ViewHolder holder, int position) {
 
+            holder.menu_name.setText(menus.get(position).getRoot().getNodeText());
+
             holder.itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -265,6 +278,8 @@ public class UserChefMenu extends Fragment implements MessageReceiver{
                     holder.menu_name.setTypeface(Typeface.DEFAULT_BOLD);
                     holder.menu_name.setTextColor(Color.BLACK);
                     activeElement = holder;
+
+                    setMenuPreview(menus.get(position));
                 }
             });
         }
