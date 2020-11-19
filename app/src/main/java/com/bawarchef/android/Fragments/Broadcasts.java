@@ -134,7 +134,7 @@ public class Broadcasts extends Fragment implements MessageReceiver {
                 Message m = new Message(Message.Direction.CLIENT_TO_SERVER,"BROADCAST_REPLY");
                 m.putProperty("ID",bic.id);
                 m.putProperty("NAME",ThisApplication.currentUserProfile.getChefIdentity().fname+" "+ThisApplication.currentUserProfile.getChefIdentity().lname);
-                m.putProperty("MSG",bic.message);
+                m.putProperty("MSG",holder.chef_input.getText().toString());
                 try{
                     EncryptedPayload ep = new EncryptedPayload(ObjectByteCode.getBytes(m), ((ThisApplication) getActivity().getApplication()).mobileClient.getCrypto_key());
                     AsyncExecutor executor = new AsyncExecutor();

@@ -168,7 +168,7 @@ public class BroadcastUserPage extends DialogFragment implements MessageReceiver
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+            holder.setIsRecyclable(false);
             holder.msg.setText(items.get(position).message);
 
             LinearLayoutManager recyMngr = new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false);
@@ -215,10 +215,10 @@ public class BroadcastUserPage extends DialogFragment implements MessageReceiver
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+            holder.setIsRecyclable(false);
             holder.chef_name.setText(replies.get(position).chefName);
             holder.chef_msg.setText(replies.get(position).message);
-            holder.itemView.setOnClickListener(v -> {
+            holder.chef_name.setOnClickListener(v -> {
                 DashboardUserActivity.activeFragment = new UserChefView(replies.get(position).chefID);
                 FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
                 DashboardUserActivity.activeFragment.setTargetFragment(BroadcastUserPage.this,9999);
